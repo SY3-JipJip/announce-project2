@@ -2,12 +2,7 @@ package sit.int204.backend.controllers;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sit.int204.backend.ListMapper;
-import sit.int204.backend.dtos.AddAnnouncementDTO;
-import sit.int204.backend.dtos.OutputAnnouncement;
 import sit.int204.backend.dtos.UserDTO;
 import sit.int204.backend.entities.User;
 import sit.int204.backend.services.UserService;
@@ -22,8 +17,7 @@ public class UserController {
     private UserService service;
     @Autowired
     private ModelMapper modelMapper;
-    @Autowired
-    private ListMapper listMapper;
+
 
     //Get User
     @GetMapping("")

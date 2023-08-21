@@ -29,9 +29,9 @@ public class User {
     @Column(name = "role", nullable = false, length = 20)
     private UserRoleEnum role;
 
-    @Column(name = "createdOn", length = 200)
+    @Column(name = "createdOn")
     private Instant  createdOn;
-    @Column(name = "updatedOn", length = 200)   //error เพราะ ตัวอักษรตก d
+    @Column(name = "updatedOn",insertable = false,updatable = false )   //error เพราะ ตัวอักษรตก d
     private Instant updatedOn;
 
 
