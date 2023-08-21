@@ -20,24 +20,29 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserService service;
+    @Autowired
+    private ModelMapper modelMapper;
+    @Autowired
+    private ListMapper listMapper;
 
     //Get User
     @GetMapping("")
     public List<User> getUsers() {
         return service.getAllUsers();
-    };
+    }
+
+    ;
 
     //Get User By Id
     @GetMapping("/{id}")
-    public User getUsersById(@PathVariable int id){
+    public User getUsersById(@PathVariable int id) {
         return service.getUserById(id);
     }
 
     //Create User
     @PostMapping("")
-    public ResponseEntity<User> createUser(@RequestBody UserDTO userDTO){
-        User cratedUser = service.createUser(userDTO);
-        return new ResponseEntity<>(cratedUser, HttpStatus.OK);  //HttpStatus.CREATED = 201 error  แต่ถ้า HttpStatus.OK = 200 กำหนดที่นี่เพราะจะให้เช็คที่ controller ก่อนเลย
+    public UserDTO createUser(@RequestBody UserDTO userDTO){
+        return modelMapper.map(service.createUser(userDTO), UserDTO.class);
     }
 
     //Update User
