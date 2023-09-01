@@ -39,8 +39,8 @@ CREATE TABLE IF NOT EXISTS `mydb`.`users` (
   `name` VARCHAR(100) NOT NULL,
   `email` VARCHAR(150) NULL,
   `role` ENUM('admin', 'announcer') NOT NULL DEFAULT 'announcer',
-  `createdOn` DATETIME NULL,
-  `updatedOn` DATETIME NULL,
+  `createdOn` DATETIME NOT NULL default current_timestamp,
+  `updatedOn` DATETIME NOT NULL default current_timestamp on update current_timestamp,
   PRIMARY KEY (`userId`),
   UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE,
   UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE)
