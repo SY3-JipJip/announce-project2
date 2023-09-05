@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -30,25 +31,9 @@ public class User {
     private UserRoleEnum role;
 
     @Column(name = "createdOn")
-    private Instant  createdOn;
+    private ZonedDateTime createdOn;
     @Column(name = "updatedOn",insertable = false,updatable = false )   //error เพราะ ตัวอักษรตก d
-    private Instant updatedOn;
-
-
-    @PrePersist
-    public void setCreatedOn() {
-        this.createdOn = Instant .now();
-        this.updatedOn = Instant .now();
-    }
-
-    @PreUpdate
-    public void setUpdatedOn() {
-        this.updatedOn = Instant .now();
-    }
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
-    private Set<Announcement> announces = new LinkedHashSet<>();
+    private ZonedDateTime updatedOn;
 
 
 }
