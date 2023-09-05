@@ -2,7 +2,13 @@ package sit.int204.backend.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sit.int204.backend.dtos.AddAnnouncementDTO;
+import sit.int204.backend.dtos.OutputAnnouncement;
 import sit.int204.backend.dtos.UserDTO;
+import sit.int204.backend.dtos.UserMatchDTO;
+import sit.int204.backend.entities.Announcement;
+import sit.int204.backend.entities.AnnouncementDisplayEnum;
+import sit.int204.backend.entities.Category;
 import sit.int204.backend.entities.User;
 import sit.int204.backend.exception.ResourceNotFoundException;
 import sit.int204.backend.repositories.UserRepository;
@@ -30,18 +36,7 @@ public class UserService {
 
     //Create User
     public User createUser(UserDTO userDTO){
-//        User newUser = new User();
-//        newUser.setUsername(userDTO.getUsername());
-//        newUser.setName(userDTO.getName());
-//        newUser.setEmail(userDTO.getEmail());
-//        newUser.setRole(userDTO.getRole());
-//
-//        Instant now = Instant.now();
-//        newUser.setCreatedOn(ZonedDateTime.from(now));
-//        newUser.setUpdatedOn(ZonedDateTime.from(now));
-//
-//        return repository.saveAndFlush(newUser);
-        repository.insertUser(userDTO.getUsername(),userDTO.getName(),userDTO.getEmail(),userDTO.getRole().toString());
+        repository.insertUser(userDTO.getUsername(),userDTO.getPassword(),userDTO.getName(),userDTO.getEmail(),userDTO.getRole().toString());
         return repository.findInsert();
     }
 
@@ -49,18 +44,7 @@ public class UserService {
     public User updateUser(int id, UserDTO userDTO) {
         repository.updateUser(id,userDTO.getUsername(),userDTO.getName(),userDTO.getEmail(),userDTO.getRole().toString());
         return getUserById(id);
-//        User editUser = getUserById(id);
-//        if (!editUser.getRole().equals(userDTO.getRole())) {
-//            // If role changes, update updatedOn timestamp
-//            editUser.setUpdatedOn(ZonedDateTime.from(Instant.now()));
-//        }
-//
-//        editUser.setUsername(userDTO.getUsername());
-//        editUser.setName(userDTO.getName());
-//        editUser.setEmail(userDTO.getEmail());
-//        editUser.setRole(userDTO.getRole());
-//
-//        return repository.saveAndFlush(editUser);
+
     }
 
     // Delete User

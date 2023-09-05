@@ -4,6 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import sit.int204.backend.dtos.UserDTO;
+import sit.int204.backend.dtos.UserMatchDTO;
 import sit.int204.backend.entities.User;
 import sit.int204.backend.services.UserService;
 
@@ -25,7 +26,6 @@ public class UserController {
         return service.getAllUsers();
     }
 
-    ;
 
     //Get User By Id
     @GetMapping("/{id}")
@@ -38,6 +38,7 @@ public class UserController {
     public User createUser(@RequestBody UserDTO userDTO){
         return service.createUser(userDTO);
     }
+
 
     //Update User
     @PutMapping("/{id}")

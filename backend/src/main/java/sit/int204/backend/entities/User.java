@@ -36,21 +36,6 @@ public class User {
     private ZonedDateTime updatedOn;
 
 
-//    @PrePersist
-//    public void setCreatedOn() {
-//        this.createdOn = ZonedDateTime.from(Instant.now());
-//        this.updatedOn = ZonedDateTime.from(Instant.now());
-//    }
-
-//    @PreUpdate
-//    public void setUpdatedOn() {
-//        this.updatedOn = ZonedDateTime.from(Instant.now());
-//    }
-//
-//    @JsonIgnore
-//    @OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
-//    private Set<Announcement> announces = new LinkedHashSet<>();
-
 
 }
 
