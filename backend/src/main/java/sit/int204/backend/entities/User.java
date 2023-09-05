@@ -36,5 +36,6 @@ public class User {
     private ZonedDateTime updatedOn;
 
 
+
 }
 

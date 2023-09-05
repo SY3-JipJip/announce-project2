@@ -14,6 +14,7 @@ import sit.int204.backend.exception.ResourceNotFoundException;
 import sit.int204.backend.repositories.UserRepository;
 
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
@@ -43,6 +44,7 @@ public class UserService {
     public User updateUser(int id, UserDTO userDTO) {
         repository.updateUser(id,userDTO.getUsername(),userDTO.getName(),userDTO.getEmail(),userDTO.getRole().toString());
         return getUserById(id);
+
     }
 
     // Delete User

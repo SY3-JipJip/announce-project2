@@ -1,177 +1,103 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRoute ,useRouter } from 'vue-router'
-import { convertDate, convertTime } from '../../composable/formatDate.js'
-
+import { getUsers } from '../../composable/getUsers';
+import { getUserById } from '../../composable/getUserById'
+import { formatDate } from '../../composable/formatDate'
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const { params } = useRoute()
 const router = useRouter()
 
-let old = ref('')
-let pDate = ref('')
-let pTime = ref('')
-let cDate = ref('')
-let cTime = ref('')
-let display = ref('')
-let displayStr = ref('')
 
-const categories = ref({})
-const displays = {
-    yes : "Y",
-    no  : "N"
-}
+//ข้อมูลเก่า
+const oldData = ref('')
+
+//ข้อมูล user ทั้งหมด เพื่อเอา role
+const userDatas = ref('')
+
+//ข้อมูลของ user id นั้นๆ
+const userDetail = ref({})
 
 
+onMounted(async () => {
+    userDetail.value = await getUserById(params.id);
+    userDatas.value = await getUsers()
 
-//ข้อมูลของ Announcement ทั้งหมด ที่ไป fetch มาจาก back
-let announcementDetail = ref({})
-onMounted(async ()=>{
-    await loadDetail()
-    categories.value = await getCategories()
-    //เราต้องแปลงเวลา ที่เป็น format UTC ให้กลายเป็น format time กับ date แยกกัน
-    if(announcementDetail.value.publishDate !== null){
-        pDate.value = convertDate(announcementDetail.value.publishDate)
-        pTime.value = convertTime(announcementDetail.value.publishDate)
+    oldData.value = {
+            "username": userDetail.value.username,
+            "name": userDetail.value.name,
+            "email": userDetail.value.email,
+            "role" : userDetail.value.role,
+            "createdOn": userDetail.value.createdOn,
+            "updatedOn" : userDetail.value.updatedOn
     }
-    if(announcementDetail.value.closeDate !== null){
-        cDate.value = convertDate(announcementDetail.value.closeDate)
-        cTime.value = convertTime(announcementDetail.value.closeDate)
-    }
-    display.value = announcementDetail.value.announcementDisplay === "Y"
 
-    old.value = {
-        "announcementTitle": announcementDetail.value.announcementTitle,
-        "announcementDescription": announcementDetail.value.announcementDescription,
-        "publishDate": pDate.value,
-        "publishTime" : pTime.value,
-        "closeDate": cDate.value,
-        "closeTime": cTime.value,
-        "announcementDisplay": display.value,
-        "announcementCategory" : announcementDetail.value.announcementCategory,
-        "categoryId": announcementDetail.value.categoryId
-    }
+    console.log(oldData.value)
 
 })
 
-//Get Announcement By ID
-const loadDetail = async () =>{
-    return await fetch(`${API_ROOT}/api/announcements/AnnCatId/${params.id}`)
-    .then(res => {
-        if(!res.ok){
-            alert('The request page is not available')
-            router.push({
-                name : 'home'
-            })
-            throw new Error(res.status)
-        }else{
-            return res.json()
-        }
-    })
-    .then(data => {
-        announcementDetail.value = data
-    })
-    .catch((err) => err)
-}
 
+const uniqueRoles = computed(() => {
+    const rolesSet = new Set();
 
-
-//ปุ่มเคลียร์ข้อมูลเก่า เผื่อ user ขี้เกียจลบ
-const clearOldData =()=> {
-    announcementDetail.value = {
-        "announcementTitle": undefined,
-        "announcementDescription": undefined,
-        "publishDate": pDate.value,
-        "publishTime" : pTime.value,
-        "closeDate": cDate.value,
-        "closeTime": cTime.value,
-        "announcementDisplay": display.value,
-        "announcementCategory" : announcementDetail.value.announcementCategory,
-        "categoryId": announcementDetail.value.categoryId
+    for (const user of userDatas.value) {
+        rolesSet.add(user.role);
     }
-}
+
+    return Array.from(rolesSet);
+});
+
+
 
 //ถ้ากดปุ่ม Cancle ก็จะ Pop up ถามว่า จะยกเลิกจริงไหม
 const cancle =()=>{
-    confirm('Are you sure you want to cancel? Announcement will be not save.')
-    router.push({name : 'home'})
+    confirm('Are you sure you want to cancel? User data will be not save.')
+    router.push({name : 'AdminUserView'})
 }
 
 //จะ return ค่าเป็น Boolean ถ้า user เลือก category
 const isEdit = computed(()=>{
     // console.log(edittingAnnouncement.value)
-    return  (edittingAnnouncement.value.announcementTitle===undefined || edittingAnnouncement.value.announcementTitle==="") ||
-    (edittingAnnouncement.value.announcementDescription===undefined || edittingAnnouncement.value.announcementDescription==="") 
-    || JSON.stringify(edittingAnnouncement.value) === JSON.stringify(old.value) 
+    return  (edittingUser.value.username===undefined|| edittingUser.value.username==="" || edittingUser.value.name===undefined || edittingUser.value.name==="" || edittingUser.value.email===undefined || edittingUser.value.email==="" || edittingUser.value.role==="" || JSON.stringify(edittingUser.value) === JSON.stringify(oldData.value) )
 })
 
 //ค่าของ edittingAnnouncement ค่าเริ่มต้นจะเป็นของข้อมูลเดิม และเมื่อ user แก้ไข ตัวแปรก็จะเปลี่ยนค่าตามที่ user input ค่าเข้ามา
-const edittingAnnouncement = computed(()=>{
+const edittingUser = computed(()=>{
+    console.log(edittingUser.value)
     return {
-        "announcementTitle": announcementDetail.value.announcementTitle,
-        "announcementDescription": announcementDetail.value.announcementDescription,
-        "publishDate": pDate.value,
-        "publishTime" : pTime.value,
-        "closeDate": cDate.value,
-        "closeTime": cTime.value,
-        "announcementDisplay": display.value,
-        "announcementCategory" : announcementDetail.value.announcementCategory,
-        "categoryId": announcementDetail.value.categoryId
+        "username": userDetail.value.username,
+        "name": userDetail.value.name,
+        "email": userDetail.value.email,
+        "role" : userDetail.value.role
     }
 })
 
+
+
 //
 const submit = async () =>{
-
-    let publishDateTime = null
-    let closeDateTime = null
-
-    displayStr.value = edittingAnnouncement.value.announcementDisplay ? displays.yes : displays.no
-
-    if(edittingAnnouncement.value.publishDate !== "" && edittingAnnouncement.value.publishTime !== ""){
-        publishDateTime = new Date(`${edittingAnnouncement.value.publishDate}T${edittingAnnouncement.value.publishTime}`).toISOString().split('.')[0]+"Z"
-    }else if(edittingAnnouncement.value.publishDate !== "" && edittingAnnouncement.value.publishTime === ""){
-        publishDateTime = new Date(`${edittingAnnouncement.value.publishDate}T06:00`).toISOString().split('.')[0]+"Z"
-    }
-    if(edittingAnnouncement.value.closeDate !== "" && edittingAnnouncement.value.closeTime !== ""){
-        closeDateTime = new Date(`${edittingAnnouncement.value.closeDate}T${edittingAnnouncement.value.closeTime}`).toISOString().split('.')[0]+"Z"
-    }else if(edittingAnnouncement.value.closeDate !== "" && edittingAnnouncement.value.closeTime === ""){
-        closeDateTime = new Date(`${edittingAnnouncement.value.closeDate}T18:00`).toISOString().split('.')[0]+"Z"
-    }
-    
-    // console.log(JSON.stringify({
-    //     "announcementTitle": edittingAnnouncement.value.announcementTitle,
-    //     "announcementDescription": edittingAnnouncement.value.announcementDescription,
-    //     "publishDate": publishDateTime,
-    //     "closeDate": closeDateTime,
-    //     "announcementDisplay": displayStr.value,
-    //     "announcementCategory" : edittingAnnouncement.value.announcementCategory,
-    //     "categoryId": edittingAnnouncement.value.categoryId
-    //     }))
-
-    await fetch(API_ROOT+'/api/announcements/'+params.id,{
+    await fetch(API_ROOT+'/api/users/'+params.id,{
         method : "PUT",
         headers: {
         "Content-Type": "application/json",
         },
         body: JSON.stringify({
-        "announcementTitle": edittingAnnouncement.value.announcementTitle,
-        "announcementDescription": edittingAnnouncement.value.announcementDescription,
-        "publishDate": publishDateTime,
-        "closeDate": closeDateTime,
-        "announcementDisplay": displayStr.value,
-        "announcementCategory" : edittingAnnouncement.value.announcementCategory,
-        "categoryId": edittingAnnouncement.value.categoryId
-        })
+        "username": edittingUser.value.username,
+        "name": edittingUser.value.name,
+        "email": edittingUser.value.email,
+        "role" : edittingUser.value.role,
+        })  
     }
     )
     .then(console.log("Update successfully"))
     .then(() => {
         alert('Update successfully');
-        router.push({ name: 'home' });
+        router.push({ name: 'AdminUserView' });
         })
     .catch((err)=>err)
     
 }
+
 </script>
  
 <template>
@@ -186,32 +112,33 @@ const submit = async () =>{
     <div class="w-full flex flex-col p-5">
         <div class="detail">
             <p>Username</p>
-            <input type="text" placeholder="Type here" class="input input-bordered w-full max-w-xs" />
+            <input type="text" placeholder="Type here" class="ann-username input input-bordered w-full max-w-xs" v-model="userDetail.username" />
         </div>
         <div class="detail">
             <p>Name</p>
-            <input type="text" placeholder="Type here" class="input input-bordered w-full max-w-xs" />
+            <input type="text" placeholder="Type here" class="ann-name input input-bordered w-full max-w-xs" v-model.trim="userDetail.name" />
         </div>
         <div class="detail">
             <p>Email</p>
-            <input type="text" placeholder="Type here" class="input input-bordered w-full max-w-xs" />
+            <input type="text" placeholder="Type here" class="ann-email input input-bordered w-full max-w-xs" v-model.trim="userDetail.email" />
         </div>
         <div class="form-control w-full max-w-xs detail">
-           <p>Role</p>
-            <select class="select select-bordered">
-                <option disabled selected>announcer</option>
-                <option>Star Wars</option>
-                <option>Harry Potter</option>
-                <option>Lord of the Rings</option>
-                <option>Planet of the Apes</option>
-                <option>Star Trek</option>
+            <p>Role</p>
+            <select name="role" class="ann-role rounded-md p-1 border-4 border-blue-900" v-model="userDetail.role">
+                <option v-for="role in uniqueRoles" :value="role">{{ role }}</option>
             </select>
-            <label class="label">
-                <span class="label-text-alt">Alt label</span>
-                <span class="label-text-alt">Alt label</span>
-            </label>
+        </div>
+        <div class="w-full">
+            <div>Created On <span class="ann-created-on">{{ formatDate(userDetail.createdOn) }}</span></div>
+            <div>Updated On <span class="ann-updated-on">{{ formatDate(userDetail.updatedOn) }}</span></div>
         </div>
     </div>
+
+    <div class="flex justify-center">
+        <button @click="submit()" class="ann-button ann-submit ml-10 btn bg-green-600 pl-5 pr-5" :disabled="isEdit">submit</button>
+        <button @click="cancle()" class="ann-button ml-5 mb-6 btn buttonCancle" >Cancle</button>
+    </div>
+
     </div>
 </div>
 </template>
