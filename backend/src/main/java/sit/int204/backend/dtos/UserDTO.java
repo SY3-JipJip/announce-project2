@@ -4,15 +4,16 @@ import lombok.Getter;
 import lombok.Setter;
 import sit.int204.backend.entities.UserRoleEnum;
 
+import java.time.Instant;
 
 @Getter
 @Setter
 public class UserDTO {
     private String username;
-    private String password;
     private String name;
     private String email;
     private UserRoleEnum role;
+    private Instant updatedOn;
 
     public String getUsername() {
         return username;
@@ -47,39 +48,11 @@ public class UserDTO {
         this.role = role;
     }
 
-    //password
-    public void setPassword(String password) {
-        // เช็คความยาว 8-14 ตัวอักษร
-        if (password.length() < 8 || password.length() > 14) {
-            throw new IllegalArgumentException("Password must be between 8 and 14 characters.");
-        }
-
-        // เช็คว่ามีอักขระตัวใหญ่
-        if (!password.matches(".*[A-Z].*")) {
-            throw new IllegalArgumentException("Password must contain at least one uppercase letter.");
-        }
-
-        // เช็คว่ามีอักขระตัวเล็ก
-        if (!password.matches(".*[a-z].*")) {
-            throw new IllegalArgumentException("Password must contain at least one lowercase letter.");
-        }
-
-        // เช็คว่ามีตัวเลข
-        if (!password.matches(".*\\d.*")) {
-            throw new IllegalArgumentException("Password must contain at least one digit.");
-        }
-
-        // เช็คว่ามีสัญลักษณ์พิเศษ
-        if (!password.matches(".*[@#$%^&+=].*")) {
-            throw new IllegalArgumentException("Password must contain at least one special character.");
-        }
-
-        // เช็คว่าไม่มีช่องว่าง
-        if (password.contains(" ")) {
-            throw new IllegalArgumentException("Password cannot contain spaces.");
-        }
-
-        this.password = password.trim();
+    public Instant getUpdatedOn() {
+        return updatedOn;
     }
 
+    public void setUpdatedOn(Instant updatedOn) {
+        this.updatedOn = updatedOn;
+    }
 }
