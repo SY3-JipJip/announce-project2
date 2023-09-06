@@ -21,7 +21,10 @@ public class User {
     private String username;
     @Column(name = "password", nullable = false, length = 100)
     private String password;
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5826f45aba55325d11a2bd7e017d015bc097a481
     @Column(name = "name", nullable = false, length = 100)
     private String name;
     @Column(name = "email", length = 150)
@@ -35,6 +38,7 @@ public class User {
     private ZonedDateTime createdOn;
     @Column(name = "updatedOn",insertable = false,updatable = false )   //error เพราะ ตัวอักษรตก d
     private ZonedDateTime updatedOn;
+
 
 
 }

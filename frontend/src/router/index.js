@@ -9,7 +9,9 @@ import UserAnnDetail from '../views/UserView/UserAnnDetail.vue'
 import AdminUserView from '../views/AdminView/AdminUserView.vue'
 import AdminAddUser from '../views/AdminView/AdminAddUser.vue'
 import AdminEditUser from '../views/AdminView/AdminEditUser.vue' 
-import AdminUserDetail from '../views/AdminView/AdminUserDetail.vue'
+import AdminDeleteUser from '../views/AdminView/AdminDeleteUser.vue' 
+
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -60,14 +62,14 @@ const router = createRouter({
     },
     {
       path: '/admin/user/:id/edit',
-      name: 'AdminEditUser ',
+      name: 'AdminEditUser',
       component: AdminEditUser
     },
     {
       path: '/admin/user/:id',
-      name: 'AdminUserDetail',
-      component: AdminUserDetail
-    }
+      name: 'AdminDeleteUser',
+      component: AdminDeleteUser
+    } 
 
 
   ]
