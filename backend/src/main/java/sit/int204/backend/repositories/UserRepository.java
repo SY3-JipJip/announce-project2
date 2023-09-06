@@ -9,8 +9,8 @@ import sit.int204.backend.entities.User;
 public interface UserRepository extends JpaRepository<User,Integer> {
     @Modifying
     @Transactional
-    @Query(value = "INSERT INTO users (username, name, email, role) VALUES (:username, :name, :email, :role)", nativeQuery = true)
-    void insertUser(String username, String name, String email, String role);
+    @Query(value = "INSERT INTO users (username, password, name, email, role) VALUES (:username, :password, :name, :email, :role)", nativeQuery = true)
+    void insertUser(String username,String password, String name, String email, String role);
 
     @Query(value = "SELECT * FROM users ORDER BY userId DESC LIMIT 1", nativeQuery = true)
     User findInsert();

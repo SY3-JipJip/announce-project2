@@ -29,7 +29,7 @@ public class UserService {
 
     //Create User
     public User createUser(UserDTO userDTO){
-        repository.insertUser(userDTO.getUsername(),userDTO.getName(),userDTO.getEmail(),userDTO.getRole().toString());
+        repository.insertUser(userDTO.getUsername(), userDTO.getPassword(), userDTO.getName(),userDTO.getEmail(),userDTO.getRole().toString());
         return repository.findInsert();
     }
 

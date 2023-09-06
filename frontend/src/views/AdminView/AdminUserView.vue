@@ -1,37 +1,37 @@
 <script setup>
-import {ref,onMounted,computed} from 'vue'
-import { formatDate } from '../../composable/formatDate'
-import { useRouter } from 'vue-router'
-import { getUsers } from '../../composable/getUsers';
-const router = useRouter()
-
-
+import {ref,onMounted} from 'vue'
 const userData = ref([])
+const API_ROOT = import.meta.env.VITE_API_ROOT
+
 onMounted(async()=>{
-  userData.value = await getUsers()
+  userData.value = await loadData()
 })
 
-const sortedUserData = computed(() => {
-  return userData.value.slice().sort((a, b) => {
-    if (a.role !== b.role) {
-      // Sort by role first
-      return a.role.localeCompare(b.role);
+const loadData = async() => {
+  try{
+    const res = await fetch(API_ROOT+"/api/announcements")
+    if(res.ok){
+      const data = await res.json()
+      return data
+    }else{
+      throw new Error('could not load data')
     }
-    // If roles are the same, sort by username
-    return a.username.localeCompare(b.username);
-  });
-});
+    
+  } catch (error) {
+    console.log(`ERROR: ${error}`)
+  }
+}
 
-const editUser = (userId) =>{
+const showUserDetail = (userId) =>{
   router.push({
-    name : 'AdminEditUser',
+    name : 'AddminUserDetail',
     params : {id : userId}
   })
 }
 
 const deleteUser = async (userId) =>{
   router.push({
-    name : 'AdminDeleteUser',
+    name : 'deleteAnnounce',
     params : {id : userId}
   })
 }
@@ -58,7 +58,7 @@ const deleteUser = async (userId) =>{
         <!-- button Add User -->
         <div class="w-full flex justify-end">
           <router-link to="/admin/user/add">
-            <button class="ann-button btn btn-neutral">
+            <button class="btn btn-neutral">
                 <img class="h-8 mr-1" src="../../assets/images/add-user.png" alt="GIF"/>
                 Add User
             </button>
@@ -82,17 +82,17 @@ const deleteUser = async (userId) =>{
         <th class="flex justify-center">Action</th>
       </tr>
     </thead>
-    <tbody v-if="sortedUserData !== null || sortedUserData.length !== 0">
-          <tr class="ann-item" v-for="user,index in sortedUserData">
+    <tbody v-if="userData !== null || userData.length !== 0">
+          <tr class="ann-item" v-for="user,index in userData">
             <th>{{ ++index }}</th>
             <td class="ann-username">{{ user.username }}</td>
             <td class="ann-name">{{ user.name }}</td>
             <td class="ann-email">{{ user.email }}</td>
             <td class="ann-role">{{ user.role }}</td>
-            <td class="ann-created-on" :class="user.createdOn === null ? 'text-center' :'' " >{{ user.createdOn === null ? '-' : formatDate(user.createdOn) }}</td>
-            <td class="ann-updated-on" :class="user.updatedOn === null ? 'text-center' :'' ">{{ user.updatedOn === null ? '-' : formatDate(user.updatedOn) }}</td>
+            <td class="ann-created-on">{{ user.created }}</td>
+            <td class="ann-updated-on">{{ user.updated }}</td>
             <td class="flex justify-center space-x-2">
-              <button @click="editUser(user.id)"  class="ann-button border border-gray-600 p-1 pl-4 pr-4 border-y-6 bg-gray-500 rounded-md btn-sm btn">edit</button>
+              <button @click="showUserDetail(user.id)"  class="ann-button border border-gray-600 p-1 pl-4 pr-4 border-y-6 bg-gray-500 rounded-md btn-sm btn">view</button>
               <button @click="deleteUser(user.id)"  class="ann-button border border-red-600 p-1 pl-3 pr-3 border-y-6 bg-red-600 rounded-md btn-sm btn">delete</button>
             </td>
           </tr>

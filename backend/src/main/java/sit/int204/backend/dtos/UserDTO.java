@@ -10,11 +10,14 @@ import java.time.Instant;
 @Setter
 public class UserDTO {
     private String username;
+    private String password;
     private String name;
     private String email;
     private UserRoleEnum role;
-    private Instant updatedOn;
 
+
+
+    //TRIM
     public String getUsername() {
         return username;
     }
@@ -48,11 +51,4 @@ public class UserDTO {
         this.role = role;
     }
 
-    public Instant getUpdatedOn() {
-        return updatedOn;
-    }
-
-    public void setUpdatedOn(Instant updatedOn) {
-        this.updatedOn = updatedOn;
-    }
 }
