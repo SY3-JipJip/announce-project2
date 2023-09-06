@@ -1,26 +1,25 @@
 package sit.int204.backend.services;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import sit.int204.backend.dtos.AddAnnouncementDTO;
-import sit.int204.backend.dtos.OutputAnnouncement;
 import sit.int204.backend.dtos.UserDTO;
-import sit.int204.backend.dtos.UserMatchDTO;
-import sit.int204.backend.entities.Announcement;
-import sit.int204.backend.entities.AnnouncementDisplayEnum;
-import sit.int204.backend.entities.Category;
 import sit.int204.backend.entities.User;
 import sit.int204.backend.exception.ResourceNotFoundException;
 import sit.int204.backend.repositories.UserRepository;
 
-import java.time.Instant;
+
 import java.util.List;
 
 @Service
 public class UserService {
+
     @Autowired
     private UserRepository repository;
-
 
     //Get All Users
     public List<User> getAllUsers() {
