@@ -1,6 +1,12 @@
 <script setup>
 import { ref, onMounted,computed } from 'vue';
 import { useRouter } from 'vue-router'
+import { getUsers } from '../../composable/getUsers';
+const oldUsers = ref([])
+onMounted(async()=>{
+    oldUsers.value = await getUsers()
+    console.log(oldUsers.value[0].name)
+})
 
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const router = useRouter()
@@ -15,7 +21,7 @@ const roles = ["admin","announcer"]
 const name = ref('')
 
 
-const errorMessage = ref()
+const errorMessage = ref('')
 
 
 
@@ -25,17 +31,22 @@ const textAlertEmpty = ref('')
 
 
 //SHOW REQUIREMENT PASSWORD & EMAIL
+const isShowingUNRequire = ref('')
+const usernameRequireText = ref('')
+const isShowingCPWRequire = ref(false)
 const isShowingPWRequire = ref(false)
 const isShowingEMRequire = ref(false)
 const passRequireText = ref('')
 const confirmPassRequireText = ref('')
+const nameRequireText = ref('')
+const isShowingNameRequire = ref('')
 const emailRequireText = ref('')
 
 //PATTERM OF PASSWORD & EMAIL
-const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%^&*()_+{}\[\]:;<>,.?/~\\|-])[\S]{8,14}$/
+const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%^&*()+{}\[\]:;<>,.?/~\\|-])[^\s]{8,14}$/
+
 const emailPattern = /^\S+@\S+\.\S+$/
 
-//PAGE
 
 
 
@@ -72,31 +83,62 @@ const enableAdd = computed(()=>{
         isEmpty.value = false
         textAlertEmpty.value = ""
     }
-
-
-    // PASSWORD PATTERN
-    if(!passwordPattern.test(password.value)){
-        passRequireText.value = 'Password must be include number, uppercase, lowercase and special characters. Do not include whitespace'
-        isShowingPWRequire.value = true
+    
+    if(username.value === oldUsers.value.find((un)=>{return un.username === username.value})){
+        usernameRequireText.value = 'does not unique'
+        isShowingUNRequire.value = true
     }else{
-        passRequireText.value = ''
-        isShowingPWRequire.value = false
+        isShowingUNRequire.value = false
+    }
+
+// PASSWORD PATTERN
+if (!passwordPattern.test(password.value) && password.value !== '' && password.value.length <= 8) {
+    passRequireText.value = 'Password must be between 8 and 14 characters'
+    isShowingPWRequire.value = true;
+} else if (password.value.length > 0 && !passwordPattern.test(password.value)) {
+    // Check if the user entered at least one special character
+    passRequireText.value = 'Password must include at least one special character';
+    isShowingPWRequire.value = true;
+} else {
+    passRequireText.value = '';
+}
+
+// NAME UNIQUE   
+    if(name.value === oldUsers.value.find((un)=>{return un.name === name.value})){
+        nameRequireText.value = 'does not unique'
+        isShowingNameRequire.value = true
+    }else{
+        isShowingNameRequire.value = false
     }
 
 
-    //EMAIL PATTERN
-    if(!emailPattern.test(email.value)){
-        isShowingEMRequire .value = true
-        emailRequireText.value = "example : exemple@email.com"
-    }else{
-        isShowingEMRequire .value = false
+// Email Pattern
+if (!emailPattern.test(email.value)) {
+    isShowingEMRequire.value = true;
+    if (email.value.length === 0) {
+        emailRequireText.value = "";
+    } else if (email.value.indexOf('@') === -1) {
+        emailRequireText.value = "Please enter a part following '@'.";
+    } else if (email.value.indexOf('@') !== -1) {
+        emailRequireText.value = "Please enter a part followed by '@'.";
+    } else if (email.value.indexOf('@') !== email.value.lastIndexOf('@')) {
+        emailRequireText.value = "A part following '@' should not contain the symbol '@'.";
+    } else {
+        emailRequireText.value = "Please include an '@' in the email address.";
     }
+} else {
+    isShowingEMRequire.value = false;
+}
 
     
     //CONFIRM PASSWORD
-    if(password.value !== confirmPassword.value){
+    if(password.value != confirmPassword.value && confirmPassword.value != ""){
+        isShowingCPWRequire.value = true
         confirmPassRequireText.value = 'The password DOES NOT match'
+    }else{
+        isShowingCPWRequire.value = false
     }
+    
 
     return isEmpty.value || isShowingEMRequire.value || isShowingPWRequire.value || password.value !== confirmPassword.value
 })
@@ -113,7 +155,7 @@ const submit = async () => {
     };
 
     try {
-        const response = await fetch(API_ROOT + 'api/users', {
+        const response = await fetch(API_ROOT + '/api/users', {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json"
@@ -123,7 +165,7 @@ const submit = async () => {
 
         if (response.ok) {
             alert('Added user successfully');
-            router.push('api/admin/user');
+            router.push('/admin/user');
         } else {
             alert('Unable to add new user!!!');
         }
@@ -140,80 +182,95 @@ const submit = async () => {
     
 <div class="sm:ml-64 p-5">
 
-    <div class="border border-2">
+    <div class="border border-2 w-full">
 
             <div class="w-full flex flex-row items-center">
                 <img src="../../assets/images/user-avatar.png" class="h-7 ml-7">
                 <h1 class="text-3xl font-bold p-5">User Detail:</h1>
             </div>
 
-            <div class="w-full flex flex-col p-5">
+            <div class="w-full flex flex-col p-5 m-2">
 
-                <div class="ann-item">
+                <div class="ann-item flex w-full flex-col space-y-5">
+
                     <!-- Username -->
-                    <div class="detail">
+                    <div class="w-full">
                         <p>Username<span class="text-red-700">*</span></p>
-                        <input type="text" placeholder="Type here" class="ann-username input input-bordered w-full max-w-xs" maxlength="45" v-model="username"/>
+                        <input type="text" placeholder="Type here" class="ann-username input input-bordered w-full max-w-xs" maxlength="45" v-model="username" required/>
                         <span class="text-sm font-medium text-slate-700 ml-2">({{ username.length }}/45)</span> 
+                        <div class="flex gap-1 items-center justify-start text-red-600" v-if="isShowingEMRequire ">
+                            <span class="ann-error-username text-sm mt-3 w-1/2 m-1 text-gray-500">{{ usernameRequireText }}</span>
+                        </div>
                     </div>
                 
                     <!-- Password -->
-                    <label class="block">
-                        <span class="block text-sm font-medium text-slate-700 mb-2 mt-4 ">Password <span class="text-red-700">*</span></span>
+                    <div class="w-full">
+                        <p>Password<span class="text-red-700">*</span></p>
                         <div class="flex">
-                        <input type="password" placeholder="Type your password here..." class="ann-password input input-bordered textarea-md  w-3/5 max-w-xs" maxlength="14" v-model="password" required/>
-                        <div class="flex flex-row justify-between w-20">
-                            <span class="text-sm font-medium text-slate-700 ml-2 mt-3">({{ password.length }}/14) </span> 
+                            <input type="password" placeholder="Type your password here..." class="ann-password input input-bordered textarea-md  w-3/5 max-w-xs" minlength="8" maxlength="14" v-model="password" required/>
+                            <div class="flex flex-row justify-between w-20">
+                                <span class="text-sm font-medium text-slate-700 ml-2 mt-3">({{ password.length }}/14) </span> 
+                            </div>
                         </div>
-                    </div>
+                        <!-- information -->
+                        <div class="flex gap-1 items-center justify-start" v-if="isShowingPWRequire">
+                         <div class='ann-error-password text-sm mt-3 w-1/3 m-1 text-red-500 flex'>
+                            <span class="font-semibold">{{passRequireText}}</span>
+                         </div>
+                        </div>    
+                </div>
 
-                    <div class="flex gap-1 items-center justify-start text-black" v-if="isShowingPWRequire">
-                        <span class="font-serif text-sm mt-3 w-1/2 m-1 text-black">{{ passRequireText }}</span>
-                    </div>
-
-                    </label>    
 
                     <!-- Confirm Password -->
-                    <label class="block">
-                        <span class="block text-sm font-medium text-slate-700 mb-2 mt-4 ">Confirm password <span class="text-red-700">*</span></span>
+                    <div class="w-full">
+                        <p>Confirm password <span class="text-red-700">*</span></p>
                         <div class="flex">
-                        <input type="password" placeholder="Confirm your password here..." class="ann-confirm-password input input-bordered textarea-md  w-3/5 max-w-xs" maxlength="14" v-model="confirmPassword" required/>
+                            <input type="password" placeholder="Confirm your password here..." class="ann-confirm-password input input-bordered textarea-md  w-3/5 max-w-xs" minlength="8" maxlength="14" v-model="confirmPassword" required/>
                             <div class="flex flex-row justify-between w-20">
                                 <span class="text-sm font-medium text-slate-700 ml-2 mt-3">({{ confirmPassword.length }}/14) </span>
                             </div>
                         </div>
-                    </label>
+                        <div class="flex gap-1 items-center justify-start" v-if="isShowingCPWRequire">
+                            <span class="ann-error-confirm-password font-serif text-sm mt-3 w-1/3 m-1 text-red-500">{{ confirmPassRequireText }}</span>
+                        </div>
+                    </div>
 
                     <!-- Name -->
-                    <label class="block">
-                        <span class="block text-sm font-medium text-slate-700 mb-2 mt-4">Name <span class="text-red-700">*</span></span>
-                        <input  type="text" placeholder="Type your name here..." class="ann-name  input input-bordered textarea-md  w-3/5 max-w-xs" maxlength="100" v-model="name" required/>
+                    <div class="w-full">
+                        <p>Name <span class="text-red-700">*</span></p>
+                        <input  type="text" placeholder="Your name" class="ann-name  input input-bordered textarea-md  w-3/5 max-w-xs" maxlength="100" v-model="name" required/>
                         <span class="text-sm font-medium text-slate-700 ml-2">({{ name.length }}/100)</span> 
-                    </label>
+                        <div class="flex gap-1 items-center justify-start text-red-600" v-if="isShowingNameRequire ">
+                            <span class="text-sm mt-3 w-1/2 m-1 text-gray-500">{{ nameRequireText }}</span>
+                        </div>
+                    </div>
 
                     <!-- Email -->
-                    <div class="block">
+                    <div class="w-full">
                         <p>Email<span class="text-red-700">*</span></p>
-                        <input type="text" placeholder="Type here" class="ann-email input input-bordered w-full max-w-xs"  v-model="email"/>
-                        <div class="flex flex-row justify-between w-20">
-                            <span class="text-sm font-medium text-slate-700 ml-2 mt-3">({{ email.length }}/150)</span>
+
+                        <div class="flex">
+                            <input type="email" placeholder="example@example.com" class="ann-email input input-bordered w-full max-w-xs" maxlength="150"  v-model="email" required/>
+                            <div class="flex flex-row justify-between w-20">
+                                <span class="ann-error-email text-sm font-medium text-slate-700 ml-2 mt-3">({{ email.length }}/150)</span>
+                            </div>
                         </div>
 
                         <div class="flex gap-1 items-center justify-start text-red-600" v-if="isShowingEMRequire ">
-                            <span class="font-serif text-sm mt-3 w-1/2 m-1 text-black">{{ emailRequireText }}</span>
+                            <span class="text-sm mt-3 w-1/2 m-1 text-red-500">{{ emailRequireText }}</span>
                         </div>
                     </div>
 
                     <!-- Role -->
-                    <label class="block  mt-3 ">
-                        <span class="block text-sm font-medium text-slate-700">Role<span class="text-red-700">*</span></span>
+                    <div class="w-full">
+                        <p>Role<span class="text-red-700">*</span></p>
                         <select name="role" class="ann-role rounded-md border p-1" v-model="role">
                             <option v-for="role in roles" :value="role">{{ role }}</option>
                         </select>
-                    </label>
+                    </div>
 
                     <!-- Warning Empty -->
-                    <div class="alert alert-error justify-start w-full h-12 mt-3 overflow-scroll overflow-x-hidden overflow-y-hidden" v-if="isEmpty">
+                    <div class="alert alert-error w-full justify-start w-1/5 h-12 mt-3 overflow-scroll overflow-x-hidden overflow-y-hidden" v-if="isEmpty">
                         <span class="font-semibold">{{ textAlertEmpty }}</span>
                     </div>
                 </div>
@@ -227,6 +284,7 @@ const submit = async () => {
             </div>
     </div>
 </div>
+
 </template>
  
 <style scoped>
