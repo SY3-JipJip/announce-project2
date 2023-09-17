@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int204.backend.dtos.AddAnnouncementDTO;
-import sit.int204.backend.dtos.OutputAnnouncement;
+import sit.int204.backend.dtos.OutputAnnouncementDTO;
 import sit.int204.backend.entities.Announcement;
 import sit.int204.backend.entities.AnnouncementDisplayEnum;
 import sit.int204.backend.entities.Category;
@@ -56,7 +56,7 @@ public class AnnouncementService {
 
 
     //Create Announcement
-    public OutputAnnouncement createNewAnnouncement(AddAnnouncementDTO announcementDTO){
+    public OutputAnnouncementDTO createNewAnnouncement(AddAnnouncementDTO announcementDTO){
         Category category = categoryService.getCategoryById(announcementDTO.getCategoryId());
         Announcement newAnnouncement = new Announcement();
         newAnnouncement.setAnnouncementTitle(announcementDTO.getAnnouncementTitle());
@@ -68,11 +68,11 @@ public class AnnouncementService {
         if(announcementDTO.getAnnouncementDisplay() == null){
             announcementDTO.setAnnouncementDisplay(AnnouncementDisplayEnum.N);
         }
-        return modelMapper.map(repository.saveAndFlush(newAnnouncement), OutputAnnouncement.class);
+        return modelMapper.map(repository.saveAndFlush(newAnnouncement), OutputAnnouncementDTO.class);
     }
 
     //Update Announcement
-    public OutputAnnouncement updateAnnouncement(int id, AddAnnouncementDTO addAnnouncementDTO){
+    public OutputAnnouncementDTO updateAnnouncement(int id, AddAnnouncementDTO addAnnouncementDTO){
         Announcement upDateAnnouncement = repository.findById((id))
                 .orElseThrow(() -> new ResourceNotFoundException("Announcement id" + id + " does not exist! "));
         upDateAnnouncement.setAnnouncementTitle(addAnnouncementDTO.getAnnouncementTitle());
@@ -83,7 +83,7 @@ public class AnnouncementService {
         Category category = categoryRepository.findById((addAnnouncementDTO.getCategoryId()))
                 .orElseThrow(()-> new ResourceNotFoundException("Announcement id " + addAnnouncementDTO.getCategoryId() + " does not exist!"));
         upDateAnnouncement.setCategories(category);
-        return modelMapper.map(repository.saveAndFlush(upDateAnnouncement), OutputAnnouncement.class);
+        return modelMapper.map(repository.saveAndFlush(upDateAnnouncement), OutputAnnouncementDTO.class);
     }
 
 

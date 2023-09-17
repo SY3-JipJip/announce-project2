@@ -7,6 +7,14 @@ import org.springframework.data.jpa.repository.Query;
 import sit.int204.backend.entities.User;
 
 public interface UserRepository extends JpaRepository<User,Integer> {
+    User findUserByUsername(String username);
+    boolean existsByUsername(String username);
+    boolean existsByName(String name);
+    boolean existsByEmail(String email);
+    boolean existsByUsernameAndIdNot(String username, int id);
+    boolean existsByNameAndIdNot(String name, int id);
+    boolean existsByEmailAndIdNot(String email, int id);
+    boolean existsById(int id);
     @Modifying
     @Transactional
     @Query(value = "INSERT INTO users (username, password, name, email, role) VALUES (:username, :password, :name, :email, :role)", nativeQuery = true)
@@ -17,7 +25,11 @@ public interface UserRepository extends JpaRepository<User,Integer> {
 
     @Modifying
     @Transactional
-    @Query(value = "UPDATE users SET username = :username, name= :name, email= :email, role= :role WHERE userId = :id", nativeQuery = true)
-    void updateUser(Integer id,String username, String name, String email, String role);
+    @Query(value = "UPDATE users SET username = :username, password = :password, name= :name, email= :email, role= :role WHERE userId = :id", nativeQuery = true)
+    void updateUser(Integer id,String username,String password, String name, String email, String role);
+
+
+
+
 }
 

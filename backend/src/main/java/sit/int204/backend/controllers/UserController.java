@@ -3,7 +3,9 @@ package sit.int204.backend.controllers;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import sit.int204.backend.dtos.ReturnUserDTO;
 import sit.int204.backend.dtos.UserDTO;
+import sit.int204.backend.dtos.UserMatchDTO;
 import sit.int204.backend.entities.User;
 import sit.int204.backend.services.UserService;
 
@@ -34,10 +36,16 @@ public class UserController {
     }
 
     //Create User
+    //--เดิม
+//    @PostMapping("")
+//    public User createUser(@RequestBody UserDTO userDTO){
+//        return service.createUser(userDTO);
+//    }
     @PostMapping("")
-    public User createUser(@RequestBody UserDTO userDTO){
-        return service.createUser(userDTO);
+    public ReturnUserDTO createUser(@RequestBody UserDTO userDTO ){
+        return modelMapper.map(service.createUser(userDTO), ReturnUserDTO.class);
     }
+
 
 //    Update User
     @PutMapping("/{id}")
@@ -50,6 +58,13 @@ public class UserController {
     @DeleteMapping("/{id}")
     public User deleteUserById (@PathVariable int id) {
         return service.deleteUser(id);
+    }
+
+
+    //Matching Username & Password
+    @PostMapping("/match")
+    public User matchUsernameAndPsw(@RequestBody UserMatchDTO userMatchDTO){
+        return service.matchPsw(userMatchDTO);
     }
 
 }
