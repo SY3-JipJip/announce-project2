@@ -10,6 +10,7 @@ import AdminUserView from '../views/AdminView/AdminUserView.vue'
 import AdminAddUser from '../views/AdminView/AdminAddUser.vue'
 import AdminEditUser from '../views/AdminView/AdminEditUser.vue' 
 import AdminDeleteUser from '../views/AdminView/AdminDeleteUser.vue' 
+import MatchPassword from '../views/AdminView/MatchPassword.vue'
 
 
 const router = createRouter({
@@ -69,9 +70,12 @@ const router = createRouter({
       path: '/admin/user/:id',
       name: 'AdminDeleteUser',
       component: AdminDeleteUser
-    } 
-
-
+    },
+    {
+      path: '/admin/user/match',
+      name: 'MatchPassword',
+      component: MatchPassword
+    }
   ]
 })
 

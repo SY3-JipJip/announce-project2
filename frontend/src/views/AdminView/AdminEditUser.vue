@@ -75,28 +75,51 @@ const edittingUser = computed(()=>{
 
 
 //
-const submit = async () =>{
-    await fetch(API_ROOT+'/api/users/'+params.id,{
-        method : "PUT",
-        headers: {
-        "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-        "username": edittingUser.value.username,
-        "name": edittingUser.value.name,
-        "email": edittingUser.value.email,
-        "role" : edittingUser.value.role,
-        })  
+const submit = async () => {
+    const result = confirm('The data will be changed!! Are you sure?');
+
+    if (result) {
+        const username = String(editedData.value.username).trim();
+        const name = String(editedData.value.name).trim();
+        const email = String(editedData.value.email).trim();
+        const role = String(editedData.value.role).trim();
+        const data = {
+            "username": username,
+            "name": name,
+            "email": email,
+            "role": role
+        };
+
+        if (JSON.stringify(data) === JSON.stringify(oldData.value)) {
+            router.push('/admin/user');
+        } else {
+            try {
+                const response = await fetch(FETCH_API + '/users/' + params.id, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert('Updated user successfully.');
+                    router.push('/admin/user');
+                } else {
+                    const errorData = await response.json();
+                    alert(`Could not update data!!! : ${errorData.message}`);
+                    router.push('/admin/user');
+                }
+            } catch (err) {
+                alert(`An error occurred: ${err}`);
+                router.push('/admin/user');
+            }
+        }
+    } else {
+        router.push('/admin/user');
     }
-    )
-    .then(console.log("Update successfully"))
-    .then(() => {
-        alert('Update successfully');
-        router.push({ name: 'AdminUserView' });
-        })
-    .catch((err)=>err)
-    
-}
+};
+
 
 </script>
  
