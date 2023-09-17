@@ -14,7 +14,7 @@ import java.time.Instant;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OutputAnnouncement {
+public class OutputAnnouncementDTO {
     private Integer id;
     private String announcementTitle;
     private String announcementDescription;

@@ -46,13 +46,13 @@ public class AnnouncementController {
 
     //Create Announcement อยู่ใน Category Controller
     @PostMapping("")
-    public OutputAnnouncement createAnnouncement(@RequestBody AddAnnouncementDTO announcementDTO ){
-        return modelMapper.map(service.createNewAnnouncement(announcementDTO), OutputAnnouncement.class);
+    public OutputAnnouncementDTO createAnnouncement(@RequestBody AddAnnouncementDTO announcementDTO ){
+        return modelMapper.map(service.createNewAnnouncement(announcementDTO), OutputAnnouncementDTO.class);
     }
 
     //Update Announcement
     @PutMapping("/{id}")
-    public OutputAnnouncement updateAnnouncementById(@PathVariable int id, @RequestBody AddAnnouncementDTO addAnnouncementDTO){
+    public OutputAnnouncementDTO updateAnnouncementById(@PathVariable int id, @RequestBody AddAnnouncementDTO addAnnouncementDTO){
         return  service.updateAnnouncement(id , addAnnouncementDTO);
     }
 
