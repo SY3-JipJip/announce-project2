@@ -1,9 +1,12 @@
 package sit.int204.backend.controllers;
 
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import sit.int204.backend.dtos.ReturnUserDTO;
+import sit.int204.backend.Annotations.UpdateUserAnnotation;
+import sit.int204.backend.dtos.CreateUserDTO;
+import sit.int204.backend.dtos.OutputUserDTO;
 import sit.int204.backend.dtos.UserDTO;
 import sit.int204.backend.dtos.UserMatchDTO;
 import sit.int204.backend.entities.User;
@@ -36,20 +39,28 @@ public class UserController {
     }
 
     //Create User
-    //--เดิม
+    //--เดิม1
 //    @PostMapping("")
 //    public User createUser(@RequestBody UserDTO userDTO){
 //        return service.createUser(userDTO);
 //    }
+
+    //--เดิม2
+//    @PostMapping("")
+//    public OutputUserDTO createUser(@Valid @RequestBody UserDTO userDTO ){
+//        return modelMapper.map(service.createUser(userDTO), OutputUserDTO.class);
+//    }
+
     @PostMapping("")
-    public ReturnUserDTO createUser(@RequestBody UserDTO userDTO ){
-        return modelMapper.map(service.createUser(userDTO), ReturnUserDTO.class);
+    public OutputUserDTO createUser(@Valid @RequestBody CreateUserDTO createUserDTO ){
+         return modelMapper.map(service.createUser(createUserDTO), OutputUserDTO.class);
     }
 
 
 //    Update User
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable int id,@RequestBody UserDTO userDTO){
+    @UpdateUserAnnotation
+    public User updateUserById(@PathVariable int id,@Valid @RequestBody UserDTO userDTO){
         return service.updateUser(id, userDTO);
     }
 

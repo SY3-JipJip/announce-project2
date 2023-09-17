@@ -1,8 +1,10 @@
 package sit.int204.backend.services;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Service;
+import sit.int204.backend.dtos.CreateUserDTO;
 import sit.int204.backend.dtos.UserDTO;
 import sit.int204.backend.dtos.UserMatchDTO;
 import sit.int204.backend.entities.User;
@@ -15,7 +17,6 @@ import java.util.List;
 
 @Service
 public class UserService{
-    private String password;
     @Autowired
     private UserRepository repository;
 
@@ -34,7 +35,7 @@ public class UserService{
     }
 
     //Create User
-    public User createUser(UserDTO userDTO){
+    public User createUser(@Valid CreateUserDTO userDTO){
         repository.insertUser(userDTO.getUsername().trim(),
                 argon2PasswordEncoder.encode(userDTO.getPassword().trim()),
 //                userDTO.getPassword().trim(),
@@ -46,7 +47,10 @@ public class UserService{
 
     //Update User
     public User updateUser(int id, UserDTO userDTO) {
-        repository.updateUser(id,userDTO.getUsername().trim(),userDTO.getName().trim(),userDTO.getPassword().trim(),userDTO.getEmail().trim(),userDTO.getRole().toString());
+        repository.updateUser(id,userDTO.getUsername().trim(),
+                                 userDTO.getName().trim(),
+                                 userDTO.getEmail().trim(),
+                                 userDTO.getRole().toString());
         return getUserById(id);
     }
 
@@ -62,7 +66,8 @@ public class UserService{
         User user = repository.findUserByUsername(userMatchDTO.getUsername());
         if (user == null) {
             throw new ResourceNotFoundException("Username is " + userMatchDTO.getUsername() + " not found!!!");
-        } else if (user.getPassword().matches(userMatchDTO.getPassword())) {
+//        } else if (user.getPassword().matches(userMatchDTO.getPassword())) {
+        } else if (argon2PasswordEncoder.matches(userMatchDTO.getPassword(),user.getPassword())) {
             return user;
         } else {
             throw new UnauthorizedException( "Password is not matching!!!");

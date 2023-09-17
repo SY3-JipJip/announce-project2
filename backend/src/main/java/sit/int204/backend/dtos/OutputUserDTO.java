@@ -8,7 +8,7 @@ import java.time.ZonedDateTime;
 
 @Getter
 @Setter
-public class ReturnUserDTO {
+public class OutputUserDTO {
     private int id;
     private String username;
     private String name;
