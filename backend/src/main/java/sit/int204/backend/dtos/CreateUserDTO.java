@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.validation.annotation.Validated;
 import sit.int204.backend.Annotations.UniqueAnnotation;
 import sit.int204.backend.entities.UserRoleEnum;
 
@@ -12,6 +13,7 @@ import sit.int204.backend.entities.UserRoleEnum;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Validated
 public class CreateUserDTO {
     @NotBlank
     @UniqueAnnotation(uniqueData = "username")

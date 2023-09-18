@@ -2,8 +2,10 @@ package sit.int204.backend.services;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import sit.int204.backend.dtos.CreateUserDTO;
 import sit.int204.backend.dtos.UserDTO;
 import sit.int204.backend.dtos.UserMatchDTO;
@@ -20,8 +22,6 @@ public class UserService{
     @Autowired
     private UserRepository repository;
 
-    private Argon2PasswordEncoder argon2PasswordEncoder = new Argon2PasswordEncoder(16,32,1,4096,3);
-
 
     //Get All Users
     public List<User> getAllUsers() {
@@ -37,8 +37,12 @@ public class UserService{
     //Create User
     public User createUser(@Valid CreateUserDTO userDTO){
         repository.insertUser(userDTO.getUsername().trim(),
+<<<<<<< HEAD
+                Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8().encode(userDTO.getPassword().trim()),
+=======
 //                argon2PasswordEncoder.encode(userDTO.getPassword().trim()),
                 userDTO.getPassword().trim(),
+>>>>>>> cde35d317e6857e7dee8afc9a7767c196346e566
                 userDTO.getName().trim(),
                 userDTO.getEmail().trim(),
                 userDTO.getRole().toString());
@@ -64,11 +68,18 @@ public class UserService{
     // Password Matching
     public User matchPsw(UserMatchDTO userMatchDTO) {
         User user = repository.findUserByUsername(userMatchDTO.getUsername());
+        System.out.println(user);
         if (user == null) {
             throw new ResourceNotFoundException("Username is " + userMatchDTO.getUsername() + " not found!!!");
+<<<<<<< HEAD
+        }
+        if (Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8().matches(userMatchDTO.getPassword().trim(), user.getPassword())) {
+             throw new ResponseStatusException(HttpStatus.OK);
+=======
         } else if (user.getPassword().matches(userMatchDTO.getPassword())) {
 //        } else if (argon2PasswordEncoder.matches(userMatchDTO.getPassword(),user.getPassword())) {
             return user;
+>>>>>>> cde35d317e6857e7dee8afc9a7767c196346e566
         } else {
             throw new UnauthorizedException( "Password is not matching!!!");
         }

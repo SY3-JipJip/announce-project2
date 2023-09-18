@@ -39,17 +39,6 @@ public class UserController {
     }
 
     //Create User
-    //--เดิม1
-//    @PostMapping("")
-//    public User createUser(@RequestBody UserDTO userDTO){
-//        return service.createUser(userDTO);
-//    }
-
-    //--เดิม2
-//    @PostMapping("")
-//    public OutputUserDTO createUser(@Valid @RequestBody UserDTO userDTO ){
-//        return modelMapper.map(service.createUser(userDTO), OutputUserDTO.class);
-//    }
 
     @PostMapping("")
     public OutputUserDTO createUser(@Valid @RequestBody CreateUserDTO createUserDTO ){
