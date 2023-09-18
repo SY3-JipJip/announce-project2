@@ -29,7 +29,11 @@ public interface UserRepository extends JpaRepository<User,Integer> {
     void updateUser(Integer id,String username, String name, String email, String role);
 
 
-
+    @Query(value = "SELECT COUNT(*) FROM users WHERE "
+            + "(:fieldName = 'username' AND username = :value AND userId != :id) "
+            + "OR (:fieldName = 'name' AND name = :value AND userId != :id) "
+            + "OR (:fieldName = 'email' AND email = :value AND userId != :id)", nativeQuery = true)
+    Long findUniqueUserOnUpdate(String fieldName, String value, Integer id);
 
 }
 
