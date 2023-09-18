@@ -43,7 +43,7 @@ const isShowingNameRequire = ref('')
 const emailRequireText = ref('')
 
 //PATTERM OF PASSWORD & EMAIL
-const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%^&*()+{}\[\]:;<>,.?/~\\|-])[^\s]{8,14}$/
+const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%^#&*()_+{}\[\]:;<>,.?/~\\|-])[\S]{8,14}$/
 
 const emailPattern = /^\S+@\S+\.\S+$/
 
@@ -57,8 +57,9 @@ const cancel =()=>{
 }
 
 
-//EMPTY FILED
 const enableAdd = computed(()=>{
+
+    //EMPTY 
     if(String(username.value).trim().length === 0){
         isEmpty.value = true
         textAlertEmpty.value = "Username cannot be empty!!!"
@@ -84,53 +85,32 @@ const enableAdd = computed(()=>{
         textAlertEmpty.value = ""
     }
     
-    if(username.value === oldUsers.value.find((un)=>{return un.username === username.value})){
-        usernameRequireText.value = 'does not unique'
-        isShowingUNRequire.value = true
-    }else{
-        isShowingUNRequire.value = false
-    }
 
-// PASSWORD PATTERN
-if (!passwordPattern.test(password.value) && password.value !== '' && password.value.length <= 8) {
-    passRequireText.value = 'Password must be between 8 and 14 characters'
-    isShowingPWRequire.value = true;
-} else if (password.value.length > 0 && !passwordPattern.test(password.value)) {
-    // Check if the user entered at least one special character
-    passRequireText.value = 'Password must include at least one special character';
-    isShowingPWRequire.value = true;
-} else {
-    passRequireText.value = '';
-}
+    // USERNAME UNIQUE   
+    const isUnique = oldUsers.value.find((user) => user.username === username.value);
 
-// NAME UNIQUE   
-    if(name.value === oldUsers.value.find((un)=>{return un.name === name.value})){
-        nameRequireText.value = 'does not unique'
-        isShowingNameRequire.value = true
-    }else{
-        isShowingNameRequire.value = false
-    }
-
-
-// Email Pattern
-if (!emailPattern.test(email.value)) {
-    isShowingEMRequire.value = true;
-    if (email.value.length === 0) {
-        emailRequireText.value = "";
-    } else if (email.value.indexOf('@') === -1) {
-        emailRequireText.value = "Please enter a part following '@'.";
-    } else if (email.value.indexOf('@') !== -1) {
-        emailRequireText.value = "Please enter a part followed by '@'.";
-    } else if (email.value.indexOf('@') !== email.value.lastIndexOf('@')) {
-        emailRequireText.value = "A part following '@' should not contain the symbol '@'.";
+    if (isUnique) {
+        usernameRequireText.value = 'does not unique';
+        isShowingUNRequire.value = true;
+        console.log(username.value);
     } else {
-        emailRequireText.value = "Please include an '@' in the email address.";
+        isShowingUNRequire.value = false;
     }
-} else {
-    isShowingEMRequire.value = false;
-}
 
-    
+    // PASSWORD PATTERN
+    if (!passwordPattern.test(password.value) && password.value !== '' && password.value.length <= 8) {
+        passRequireText.value = 'Password must be between 8 and 14 characters'
+        isShowingPWRequire.value = true;
+    } else if (password.value.length > 0 && !passwordPattern.test(password.value)) {
+        // Check if the user entered at least one special character
+        passRequireText.value = 'Password must include at least one special character';
+        isShowingPWRequire.value = true;
+    } else {
+        passRequireText.value = '';
+        isShowingPWRequire.value = false
+    }
+
+
     //CONFIRM PASSWORD
     if(password.value != confirmPassword.value && confirmPassword.value != ""){
         isShowingCPWRequire.value = true
@@ -138,9 +118,27 @@ if (!emailPattern.test(email.value)) {
     }else{
         isShowingCPWRequire.value = false
     }
-    
 
-    return isEmpty.value || isShowingEMRequire.value || isShowingPWRequire.value || password.value !== confirmPassword.value
+
+    // Email Pattern
+    if (!emailPattern.test(email.value)) {
+        isShowingEMRequire.value = true;
+        if (email.value.length === 0) {
+            emailRequireText.value = "";
+        } else if (email.value.indexOf('@') === -1) {
+            emailRequireText.value = "Please enter a part following '@'.";
+        } else if (email.value.indexOf('@') !== -1) {
+            emailRequireText.value = "Please enter a part followed by '@'.";
+        } else if (email.value.indexOf('@') !== email.value.lastIndexOf('@')) {
+            emailRequireText.value = "A part following '@' should not contain the symbol '@'.";
+        } else {
+            emailRequireText.value = "Please include an '@' in the email address.";
+        }
+    } else {
+        isShowingEMRequire.value = false;
+    }
+    
+    return isEmpty.value || isShowingUNRequire.value || isShowingPWRequire.value || isShowingCPWRequire.value ||  isShowingNameRequire.value || isShowingEMRequire.value 
 })
 
 
@@ -198,8 +196,8 @@ const submit = async () => {
                         <p>Username<span class="text-red-700">*</span></p>
                         <input type="text" placeholder="Type here" class="ann-username input input-bordered w-full max-w-xs" maxlength="45" v-model="username" required/>
                         <span class="text-sm font-medium text-slate-700 ml-2">({{ username.length }}/45)</span> 
-                        <div class="flex gap-1 items-center justify-start text-red-600" v-if="isShowingEMRequire ">
-                            <span class="ann-error-username text-sm mt-3 w-1/2 m-1 text-gray-500">{{ usernameRequireText }}</span>
+                        <div class="flex gap-1 items-center justify-start text-red-600" v-if="isShowingUNRequire ">
+                            <span class="ann-error-username text-sm mt-3 w-1/2 m-1 text-red-500">{{ usernameRequireText }}</span> 
                         </div>
                     </div>
                 

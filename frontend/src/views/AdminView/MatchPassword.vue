@@ -7,15 +7,14 @@ const alertText = ref('')
 const className = ref('')
 const warning = ref(false)
 const statusCode = ref(0)
-const FETCH_API = import.meta.env.VITE_API
-
+const API_ROOT = import.meta.env.VITE_API_ROOT
 const match = async()=>{
     let userInfo = {
         username : username.value.trim(),
-        password : password.value.trim() ?? ''
+        password : password.value.trim()
     }
     try{
-        const res = await fetch(FETCH_API + 'api/users/match',{
+        const res = await fetch(API_ROOT + '/api/users/match',{
             method : "POST",
             headers : {
                 "Content-type" : "application/json"

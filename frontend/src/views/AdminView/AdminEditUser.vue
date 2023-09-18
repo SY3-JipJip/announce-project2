@@ -79,10 +79,10 @@ const submit = async () => {
     const result = confirm('The data will be changed!! Are you sure?');
 
     if (result) {
-        const username = String(editedData.value.username).trim();
-        const name = String(editedData.value.name).trim();
-        const email = String(editedData.value.email).trim();
-        const role = String(editedData.value.role).trim();
+        const username = String(edittingUser.value.username).trim();
+        const name = String(edittingUser.value.name).trim();
+        const email = String(edittingUser.value.email).trim();
+        const role = String(edittingUser.value.role).trim();
         const data = {
             "username": username,
             "name": name,
@@ -94,7 +94,7 @@ const submit = async () => {
             router.push('/admin/user');
         } else {
             try {
-                const response = await fetch(FETCH_API + '/users/' + params.id, {
+                const response = await fetch(API_ROOT + '/api/users/' + params.id, {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json"
