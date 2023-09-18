@@ -35,10 +35,10 @@ DEFAULT CHARACTER SET = utf8mb3;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mydb`.`users` (
   `userId` INT NOT NULL AUTO_INCREMENT,
-  `username` VARCHAR(45) NOT NULL,
+  `username` VARCHAR(45) NOT NULL unique,
   `password` VARCHAR(100) NOT NULL,
-  `name` VARCHAR(100) NOT NULL,
-  `email` VARCHAR(150) NULL,
+  `name` VARCHAR(100) NOT NULL unique,
+  `email` VARCHAR(150) NULL unique,
   `role` ENUM('admin', 'announcer') NOT NULL DEFAULT 'announcer',
   `createdOn` DATETIME NOT NULL default current_timestamp,
   `updatedOn` DATETIME NOT NULL default current_timestamp on update current_timestamp,
