@@ -46,11 +46,16 @@ insert into `mydb`.`users`(userId, username, name, password , email, role, creat
           (1,'sanit','Sanit Sirisawatvatana','Sasadmin22','sanit.sir@kmutt.ac.th','admin', '2023-08-15 08:00:00+07:00', '2023-08-15 08:00:00+07:00' ),
           (2,'pornthip','Pornthip Sirijutikul','Sasbscit22','pornthip.sri@kmutt.ac.th','announcer', '2023-08-15 09:30:00+07:00' , '2023-08-15 09:30:00+07:00'),
           (3,'jaruwan_w','Jaruwan Maneesart','Sasinter22','jaruwan.wee@kmutt.ac.th','announcer', '2023-08-16 08:00:00+07:00' , '2023-08-16 08:00:00+07:00'),
+<<<<<<< HEAD
           (4,'vichchuda','Vichchuda Tedoloh','Sasgrant22','vichchuda.ted@kmutt.ac.th','announcer','2023-08-16 09:30:00+07:00' , '2023-08-16 09:30:00+07:00'),
           (5,'sunisa','Sunisa Sathapornvajana','Sasgrant22','vichchuda.ted@kmutt.ac.th','announcer','2023-08-16 09:30:00+07:00' , '2023-08-16 09:30:00+07:00');
 >>>>>>> cde35d317e6857e7dee8afc9a7767c196346e566
 select *
 from `mydb`.`users`;
+=======
+          (4,'vichchuda','Vichchuda Tedoloh','Sasgrant22','vichchuda.ted@kmutt.ac.th','announcer','2023-08-16 09:30:00+07:00' , '2023-08-16 09:30:00+07:00');
+select *from `mydb`.`users`;
+>>>>>>> 1c84d95e9260ef7d496747f7560fa19bd92a109c
 
 INSERT INTO `mydb`.`announces` (announcementTitle, announcementDescription, publishDate, closeDate, announcementDisplay, categoryId,userId) 
 VALUES 
