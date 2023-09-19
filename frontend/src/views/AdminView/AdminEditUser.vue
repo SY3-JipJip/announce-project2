@@ -110,9 +110,14 @@ const submit = async () => {
                 if (response.ok) {
                     alert('Updated user successfully.');
                     router.push('/admin/user');
-                } else {
+                }else {
                     const errorData = await response.json();
-                    alert(`Could not update data!!! : ${errorData.message}`);
+                    let errorMessage = "Could not update data!!! :";
+                for (const error of errorData.detail) {
+                    errorMessage += ` ${error.field}: ${error.errorMessage},`;
+                }
+                    errorMessage = errorMessage.slice(0, -1);
+                    alert(errorMessage);
                 }
             } catch (err) {
                 alert(`An error occurred: ${err}`);
@@ -122,7 +127,7 @@ const submit = async () => {
     } 
 
 // USERNAME UNIQUE   
-const isUnique = userDatas.value.find((user) => user.username === userDetail.value.username);
+const isUnique = userDatas.value.find((user) => user.username.toLowerCase() === userDetail.value.username.toLowerCase());
 
 if (isUnique) {
     usernameRequireText.value = 'does not unique';
@@ -134,7 +139,7 @@ if (isUnique) {
 
 
 // NAME UNIQUE   
-const isUniqueName = userDatas.value.find((user) => user.name === userDetail.value.name);
+const isUniqueName = userDatas.value.find((user) => user.name.toLowerCase() === userDetail.value.name.toLowerCase());
 if (isUniqueName) {
     nameRequireText.value = 'does not unique';
     isShowingNameRequire.value = true;
@@ -144,7 +149,7 @@ if (isUniqueName) {
 
 
 // EMAIL UNIQUE   
-const isUniqueEmail = userDatas.value.find((user) => user.email === userDetail.value.email);
+const isUniqueEmail = userDatas.value.find((user) => user.email.toLowerCase() === userDetail.value.email.toLowerCase());
 if (isUniqueEmail) {
     emailRequireText.value = 'does not unique';
     isShowingEMRequire.value = true;
@@ -165,13 +170,13 @@ if (isUniqueEmail) {
         <h1 class="text-3xl font-bold p-5">User Detail:</h1>
     </div>
 
-    <div class="w-full flex flex-col p-5">
+    <div class="w-full flex flex-col p-5 space-y-4">
         <!-- Username -->
         <div class="w-full">
-            <p>Username<span class="text-red-700">*</span></p>{{ usernameRequireText }}
+            <p>Username<span class="text-red-700">*</span></p>
             <input @input="removeSpace" type="text" placeholder="Type here" class="ann-username input input-bordered w-full max-w-xs" maxlength="45" v-model.trim="userDetail.username" required/>
             <div class="flex gap-1 items-center justify-start text-red-600" v-show="isShowingUNRequire ">
-                <span class="ann-error-username input:invalid text-sm mt-3 w-1/2 m-1 text-red-500">{{ usernameRequireText }}</span> 
+                <span class="ann-error-username input:invalid text-sm mt-3 w-1/2 m-1 text-red-500 font-semibold">{{ usernameRequireText }}</span> 
             </div>
         </div>
 
@@ -180,7 +185,7 @@ if (isUniqueEmail) {
             <p>Name <span class="text-red-700">*</span></p>
             <input type="text" placeholder="Your name" class="ann-name input input-bordered textarea-md  w-3/5 max-w-xs" maxlength="100" v-model.trim="userDetail.name" required/>
             <div class="flex gap-1 items-center justify-start text-red-600" v-show="isShowingNameRequire ">
-                <span class="ann-error-name text-sm mt-3 w-1/2 m-1 text-red-500">{{ nameRequireText }}</span>
+                <span class="ann-error-name text-sm mt-3 w-1/2 m-1 text-red-500 font-semibold">{{ nameRequireText }}</span>
             </div>
         </div>
 

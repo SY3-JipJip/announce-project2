@@ -133,7 +133,33 @@ const enableAdd = computed(()=>{
             isShowingEMRequire.value = false;
         }
 
-    
+        // USERNAME UNIQUE
+    const isUniqueUsername = oldUsers.value.find((user) => user.username.toLowerCase() === username.value.toLowerCase());
+    if (isUniqueUsername) {
+        usernameRequireText.value = 'does not unique';
+        isShowingUNRequire.value = true;
+    } else {
+        isShowingUNRequire.value = false;
+    }
+
+    // NAME UNIQUE (case-insensitive)
+    const isUniqueName = oldUsers.value.find((user) => user.name.toLowerCase() === name.value.toLowerCase());
+    if (isUniqueName) {
+        nameRequireText.value = 'does not unique';
+        isShowingNameRequire.value = true;
+    } else {
+        isShowingNameRequire.value = false;
+    }
+
+
+    // EMAIL UNIQUE
+    const isUniqueEmail = oldUsers.value.find((user) => user.email.toLowerCase() === email.value.toLowerCase());
+    if (isUniqueEmail) {
+        emailRequireText.value = 'does not unique';
+        isShowingEMRequire.value = true;
+    } else {
+        isShowingEMRequire.value = false;
+    }
 
 })
 
@@ -163,38 +189,18 @@ const submit = async () => {
             router.push('/admin/user');
         } else {
             // ถ้าไม่สำเร็จในการเพิ่มผู้ใช้ใหม่
-            alert('Unable to add new user!!!');
+            const errorData = await response.json();
+            let errorMessage = "Unable to add new user!!! :";
+            for (const error of errorData.detail) {
+            errorMessage += ` ${error.field}: ${error.errorMessage},`;
+            }
+            errorMessage = errorMessage.slice(0, -1);
+            alert(errorMessage);
         }
     } catch (err) {
         errorMessage.value = err;
     }
 
-    // USERNAME UNIQUE
-    const isUniqueUsername = oldUsers.value.find((user) => user.username === newUser.username);
-    if (isUniqueUsername) {
-        usernameRequireText.value = 'does not unique';
-        isShowingUNRequire.value = true;
-    } else {
-        isShowingUNRequire.value = false;
-    }
-
-    // NAME UNIQUE
-    const isUniqueName = oldUsers.value.find((user) => user.name === newUser.name);
-    if (isUniqueName) {
-        nameRequireText.value = 'does not unique';
-        isShowingNameRequire.value = true;
-    } else {
-        isShowingNameRequire.value = false;
-    }
-
-    // EMAIL UNIQUE
-    const isUniqueEmail = oldUsers.value.find((user) => user.email === newUser.email);
-    if (isUniqueEmail) {
-        emailRequireText.value = 'does not unique';
-        isShowingEMRequire.value = true;
-    } else {
-        isShowingEMRequire.value = false;
-    }
 };
 
 
@@ -226,7 +232,7 @@ const submit = async () => {
                         <input @input="removeSpace" type="text" placeholder="Type here" class="ann-username input input-bordered w-full max-w-xs" maxlength="45" v-model.trim="username" required/>
                         <span class="text-sm font-medium text-slate-700 ml-2">({{ username.length }}/45)</span> 
                         <div class="flex gap-1 items-center justify-start text-red-600" v-show="isShowingUNRequire ">
-                            <span class="ann-error-username input:invalid text-sm mt-3 w-1/2 m-1 text-red-500">{{ usernameRequireText }}</span> 
+                            <span class="ann-error-username input:invalid text-sm mt-3 w-1/2 m-1 text-red-500 font-semibold">{{ usernameRequireText }}</span> 
                         </div>
                     </div>
                 
