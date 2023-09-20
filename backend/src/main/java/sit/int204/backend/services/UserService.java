@@ -37,12 +37,7 @@ public class UserService{
     //Create User
     public User createUser(@Valid CreateUserDTO userDTO){
         repository.insertUser(userDTO.getUsername().trim(),
-<<<<<<< HEAD
                 Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8().encode(userDTO.getPassword().trim()),
-=======
-//                argon2PasswordEncoder.encode(userDTO.getPassword().trim()),
-                userDTO.getPassword().trim(),
->>>>>>> cde35d317e6857e7dee8afc9a7767c196346e566
                 userDTO.getName().trim(),
                 userDTO.getEmail().trim(),
                 userDTO.getRole().toString());
@@ -71,15 +66,9 @@ public class UserService{
         System.out.println(user);
         if (user == null) {
             throw new ResourceNotFoundException("Username is " + userMatchDTO.getUsername() + " not found!!!");
-<<<<<<< HEAD
         }
         if (Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8().matches(userMatchDTO.getPassword().trim(), user.getPassword())) {
              throw new ResponseStatusException(HttpStatus.OK);
-=======
-        } else if (user.getPassword().matches(userMatchDTO.getPassword())) {
-//        } else if (argon2PasswordEncoder.matches(userMatchDTO.getPassword(),user.getPassword())) {
-            return user;
->>>>>>> cde35d317e6857e7dee8afc9a7767c196346e566
         } else {
             throw new UnauthorizedException( "Password is not matching!!!");
         }
