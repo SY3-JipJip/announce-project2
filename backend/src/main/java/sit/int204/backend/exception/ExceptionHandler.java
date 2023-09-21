@@ -16,6 +16,7 @@ import org.springframework.web.context.request.WebRequest;
 public class ExceptionHandler {
     @org.springframework.web.bind.annotation.ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorReturn> handleValidationException(MethodArgumentNotValidException ex, WebRequest webRequest) {
+        System.out.println("Work!!");
         ErrorReturn errorResponse = new ErrorReturn(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), webRequest.getDescription(false).substring(4));
         ex.getBindingResult().getFieldErrors().forEach((error) -> {
             errorResponse.addValidationError(error.getField(), error.getDefaultMessage());
