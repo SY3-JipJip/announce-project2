@@ -3,6 +3,9 @@ package sit.int204.backend.controllers;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.MethodParameter;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import sit.int204.backend.Annotations.UpdateUserAnnotation;
 import sit.int204.backend.dtos.CreateUserDTO;
@@ -39,7 +42,6 @@ public class UserController {
     }
 
     //Create User
-
     @PostMapping("")
     public OutputUserDTO createUser(@Valid @RequestBody CreateUserDTO createUserDTO ){
          return modelMapper.map(service.createUser(createUserDTO), OutputUserDTO.class);
@@ -49,7 +51,9 @@ public class UserController {
 //    Update User
     @PutMapping("/{id}")
     @UpdateUserAnnotation
-    public User updateUserById(@PathVariable int id,@Valid @RequestBody UserDTO userDTO){
+    public User updateUserById(@PathVariable int id, @Valid @RequestBody UserDTO userDTO, BindingResult bindingResult) throws MethodArgumentNotValidException {
+        if(bindingResult.hasErrors()){ throw new MethodArgumentNotValidException((MethodParameter) null, bindingResult);
+        }
         return service.updateUser(id, userDTO);
     }
 
