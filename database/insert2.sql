@@ -22,6 +22,13 @@ select *
 from `mydb`.`categories`;
 
 
+-- 1. 
+-- insert into `mydb`.`users`(userId, username, name , password, email, role, createdOn, updatedOn) values
+--           (1,'sanit','Sanit Sirisawatvatana','Sasadmin22','sanit.sir@kmutt.ac.th','admin', '2023-08-15 08:00:00+07:00', '2023-08-15 08:00:00+07:00' ),
+--           (2,'pornthip','Pornthip Sirijutikul','Sasbscit22','pornthip.sri@kmutt.ac.th','announcer', '2023-08-15 09:30:00+07:00' , '2023-08-15 09:30:00+07:00'),
+--           (3,'jaruwan_w','Jaruwan Maneesart','Sasinter22','jaruwan.wee@kmutt.ac.th','announcer', '2023-08-16 08:00:00+07:00' , '2023-08-16 08:00:00+07:00'),
+--           (4,'vichchuda','Vichchuda Tedoloh','Sasgrant22','vichchuda.ted@kmutt.ac.th','announcer','2023-08-16 09:30:00+07:00' , '2023-08-16 09:30:00+07:00');
+
 -- 2. for PUT methode
 insert into `mydb`.`users`(userId, username, name , password, email, role, createdOn, updatedOn) values
 		  (1,'sanit','Sanit Sirisawatvatana','$argon2id$v=19$m=16,t=2,p=1$Z25kV0dzWkoxY2JKRmRYbQ$pQ0HF35SUAM1IhZGe0Ebig','sanit.sir@kmutt.ac.th','admin', '2023-08-15 08:00:00+07:00', '2023-08-15 08:00:00+07:00' ),
@@ -29,6 +36,12 @@ insert into `mydb`.`users`(userId, username, name , password, email, role, creat
           (3,'jaruwan_w','Jaruwan Maneesart','$argon2id$v=19$m=16,t=2,p=1$Z25kV0dzWkoxY2JKRmRYbQ$5Mb1rU1A17Bn6iSnAUTgsg','jaruwan.wee@kmutt.ac.th','announcer', '2023-08-16 08:00:00+07:00' , '2023-08-16 08:00:00+07:00'),
           (4,'vichchuda','Vichchuda Tedoloh','$argon2id$v=19$m=16,t=2,p=1$Z25kV0dzWkoxY2JKRmRYbQ$bz2bXhNzaRRR1+9ULa2RIw','vichchuda.ted@kmutt.ac.th','announcer','2023-08-16 09:30:00+07:00' , '2023-08-16 09:30:00+07:00');
 
+-- 3.
+-- insert into users( userId, username, password, name, email, role, createdOn, updatedOn) values
+--           (1,'sanit','$argon2id$v=19$m=4096,t=3,p=1$Znh2ak13dTRSbU9QVXNGYg$6iSakMRomYqleXWeUdF4Yg','Sanit Sirisawatvatana','sanit.sir@kmutt.ac.th','admin', '2023-08-15 08:00:00+07:00', '2023-08-15 08:00:00+07:00' ),
+--           (2,'pornthip','$argon2id$v=19$m=4096,t=3,p=1$Znh2ak13dTRSbU9QVXNGYg$5avkkx8dENgMN5jyX0qrbQ','Pornthip Sirijutikul','pornthip.sri@kmutt.ac.th','announcer', '2023-08-15 09:30:00+07:00' , '2023-08-15 09:30:00+07:00'),
+--           (3,'jaruwan_w','$argon2id$v=19$m=4096,t=3,p=1$Znh2ak13dTRSbU9QVXNGYg$+7aPNDQc0wGNI1gffe4gWQ','Jaruwan Maneesart','jaruwan.wee@kmutt.ac.th','announcer', '2023-08-16 08:00:00+07:00' , '2023-08-16 08:00:00+07:00'),
+--           (4,'vichchuda','$argon2id$v=19$m=4096,t=3,p=1$Znh2ak13dTRSbU9QVXNGYg$VDsx4Gg34lXAoIxJO9JcbQ','Vichchuda Tedoloh','vichchuda.ted@kmutt.ac.th','announcer','2023-08-16 09:30:00+07:00' , '2023-08-16 09:30:00+07:00');
 
 
 select *
