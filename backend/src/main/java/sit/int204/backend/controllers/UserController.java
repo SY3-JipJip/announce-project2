@@ -5,6 +5,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import sit.int204.backend.Annotations.UpdateUserAnnotation;
@@ -16,6 +17,7 @@ import sit.int204.backend.entities.User;
 import sit.int204.backend.services.UserService;
 
 import java.util.List;
+
 
 @RestController
 @CrossOrigin
@@ -33,7 +35,6 @@ public class UserController {
         return service.getAllUsers();
     }
 
-    ;
 
     //Get User By Id
     @GetMapping("/{id}")
