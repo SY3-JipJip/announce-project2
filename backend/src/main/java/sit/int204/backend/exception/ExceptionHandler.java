@@ -9,7 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
 @Getter @Setter @RequiredArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
