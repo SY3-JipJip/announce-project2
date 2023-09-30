@@ -5,10 +5,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import sit.int204.backend.Annotations.UpdateUserAnnotation;
+import sit.int204.backend.annotations.UpdateUserAnnotation;
 import sit.int204.backend.dtos.CreateUserDTO;
 import sit.int204.backend.dtos.OutputUserDTO;
 import sit.int204.backend.dtos.UserDTO;
@@ -41,6 +40,7 @@ public class UserController {
     public User getUsersById(@PathVariable int id) {
         return service.getUserById(id);
     }
+
 
     //Create User
     @PostMapping("")

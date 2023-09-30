@@ -3,6 +3,7 @@ package sit.int204.backend;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import sit.int204.backend.utils.ListMapper;
 
 @Configuration
 public class ApplicationConfig {

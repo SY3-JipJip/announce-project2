@@ -1,7 +1,7 @@
-package sit.int204.backend.Validators;
+package sit.int204.backend.validators;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import sit.int204.backend.Annotations.UniqueAnnotation;
+import sit.int204.backend.annotations.UniqueAnnotation;
 import sit.int204.backend.repositories.UserRepository;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

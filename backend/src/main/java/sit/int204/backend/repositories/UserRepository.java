@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import sit.int204.backend.entities.User;
 
+import java.util.Optional;
+
 public interface UserRepository extends JpaRepository<User,Integer> {
     User findUserByUsername(String username);
     boolean existsByUsername(String username);
@@ -34,6 +36,7 @@ public interface UserRepository extends JpaRepository<User,Integer> {
             + "OR (:fieldName = 'name' AND name = :value AND userId != :id) "
             + "OR (:fieldName = 'email' AND email = :value AND userId != :id)", nativeQuery = true)
     Long findUniqueUserOnUpdate(String fieldName, String value, Integer id);
+
 
 }
 

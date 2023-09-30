@@ -1,4 +1,4 @@
-package sit.int204.backend.Validators;
+package sit.int204.backend.validators;
 
 
 import jakarta.validation.ConstraintValidator;
@@ -6,7 +6,7 @@ import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.constraintvalidation.SupportedValidationTarget;
 import jakarta.validation.constraintvalidation.ValidationTarget;
 import org.springframework.beans.factory.annotation.Autowired;
-import sit.int204.backend.Annotations.UpdateUserAnnotation;
+import sit.int204.backend.annotations.UpdateUserAnnotation;
 import sit.int204.backend.dtos.UserDTO;
 import sit.int204.backend.repositories.UserRepository;
 
