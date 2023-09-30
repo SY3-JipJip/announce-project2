@@ -1,4 +1,4 @@
-package sit.int204.backend.Annotations;
+package sit.int204.backend.annotations;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;

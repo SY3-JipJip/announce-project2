@@ -1,9 +1,9 @@
-package sit.int204.backend.Annotations;
+package sit.int204.backend.annotations;
 
 import java.lang.annotation.*;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import sit.int204.backend.Validators.UniqueValidate;
+import sit.int204.backend.validators.UniqueValidate;
 
 @Documented
 @Constraint(validatedBy = UniqueValidate.class)

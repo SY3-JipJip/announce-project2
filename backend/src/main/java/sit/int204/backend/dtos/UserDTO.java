@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.validation.annotation.Validated;
-import sit.int204.backend.Annotations.UniqueUserUpdate;
+import sit.int204.backend.annotations.UniqueUserUpdate;
 import sit.int204.backend.entities.UserRoleEnum;
 
 @Getter

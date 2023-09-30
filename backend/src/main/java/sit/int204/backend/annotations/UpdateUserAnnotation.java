@@ -1,8 +1,8 @@
-package sit.int204.backend.Annotations;
+package sit.int204.backend.annotations;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import sit.int204.backend.Validators.UpdateUserValidate;
+import sit.int204.backend.validators.UpdateUserValidate;
 
 import java.lang.annotation.*;
 
