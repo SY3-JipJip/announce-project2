@@ -16,6 +16,7 @@ import sit.int204.backend.entities.User;
 import sit.int204.backend.services.UserService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -28,10 +29,25 @@ public class UserController {
     private ModelMapper modelMapper;
 
 
+
     //Get User
+//    @GetMapping("")
+//    public List<User> getUsers() {
+//        return service.getAllUsers();
+//    }
+
+
     @GetMapping("")
-    public List<User> getUsers() {
-        return service.getAllUsers();
+    public List<OutputUserDTO> getUsers() {
+        List<User> users = service.getAllUsers();
+
+        // ใช้ ModelMapper หรือแปลงข้อมูลเอง
+        ModelMapper modelMapper = new ModelMapper();
+        List<OutputUserDTO> outputUserDTOs = users.stream()
+                .map(user -> modelMapper.map(user, OutputUserDTO.class))
+                .collect(Collectors.toList());
+
+        return outputUserDTOs;
     }
 
 

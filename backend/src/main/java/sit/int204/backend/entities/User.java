@@ -36,7 +36,5 @@ public class User {
     private ZonedDateTime updatedOn;
 
 
-    public <E> User(String username, String password, ArrayList<E> es) {
-    }
 }
 
