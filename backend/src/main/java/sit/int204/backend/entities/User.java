@@ -1,14 +1,11 @@
 package sit.int204.backend.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.ArrayList;
+
 
 @Getter
 @Setter
@@ -32,12 +29,14 @@ public class User {
     @Column(name = "role", nullable = false, length = 20)
     private UserRoleEnum role;
 
+
     @Column(name = "createdOn")
     private ZonedDateTime createdOn;
     @Column(name = "updatedOn",insertable = false,updatable = false )   //error เพราะ ตัวอักษรตก d
     private ZonedDateTime updatedOn;
 
 
-
+    public <E> User(String username, String password, ArrayList<E> es) {
+    }
 }
 

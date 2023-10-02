@@ -41,7 +41,8 @@ insert into `mydb`.`users`(userId, username, name , password, email, role, creat
  (1,'sanit','Sanit Sirisawatvatana','$argon2id$v=19$m=4096,t=3,p=1$fabZIRZZrUuxRrnXoGkMjA$DZ90F9+3/rnHGKY/YmyQoZwOToS4mJbuLYZkpXQt2VY','sanit.sir@kmutt.ac.th','admin', '2023-08-15 08:00:00+07:00', '2023-08-15 08:00:00+07:00' ),
           (2,'pornthip','Pornthip Sirijutikul','$argon2id$v=19$m=4096,t=3,p=1$mZdjYXK6+s34Zd6PeVQG2Q$S9TGRhlIw2l7kIFYyPLJk6T5TDNHYa90Z/4gHubUNE8','pornthip.sri@kmutt.ac.th','announcer', '2023-08-15 09:30:00+07:00' , '2023-08-15 09:30:00+07:00'),
           (3,'jaruwan_w','Jaruwan Maneesart','$argon2id$v=19$m=4096,t=3,p=1$pTop1432FBQ8IlbizoaWsQ$6tG5y9QZ5uOz7qQe41vSwdr6wwnmLU9RFWrORpRaLdo','jaruwan.wee@kmutt.ac.th','announcer', '2023-08-16 08:00:00+07:00' , '2023-08-16 08:00:00+07:00'),
-          (4,'vichchuda','Vichchuda Tedoloh','$argon2id$v=19$m=4096,t=3,p=1$XV/IqnCROw+/qCsQrD918g$bkcBkt4zmphxiVdYN0f2IvH8YW10jaHG9Sp7jmijycU','vichchuda.ted@kmutt.ac.th','announcer','2023-08-16 09:30:00+07:00' , '2023-08-16 09:30:00+07:00');
+          (4,'vichchuda','Vichchuda Tedoloh','$argon2id$v=19$m=4096,t=3,p=1$XV/IqnCROw+/qCsQrD918g$bkcBkt4zmphxiVdYN0f2IvH8YW10jaHG9Sp7jmijycU','vichchuda.ted@kmutt.ac.th','announcer','2023-08-16 09:30:00+07:00' , '2023-08-16 09:30:00+07:00'),
+          (5,'nanthawan','Nanthawan Pran','$argon2i$v=19$m=16,t=2,p=1$MGpXd1lZRjJSbEZLU1hrMA$2evoBOvib2DGlqgZWw+P91Q55byUQQvTmWY/UE9qA4U','nanthawan.ice@kmutt.ac.th','announcer','2023-08-24 09:30:00+07:00' , '2023-08-24 09:30:00+07:00');
 
 -- 3.
 -- insert into users( userId, username, password, name, email, role, createdOn, updatedOn) values
