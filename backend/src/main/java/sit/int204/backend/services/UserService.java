@@ -63,7 +63,6 @@ public class UserService{
     // Password Matching
     public User matchPsw(UserMatchDTO userMatchDTO) {
         User user = repository.findUserByUsername(userMatchDTO.getUsername());
-        System.out.println(user);
         if (user == null) {
             throw new ResourceNotFoundException("Username is " + userMatchDTO.getUsername() + " not found!!!");
         }

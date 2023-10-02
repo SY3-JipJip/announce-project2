@@ -14,7 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 
 import io.jsonwebtoken.ExpiredJwtException;
-import sit.int204.backend.services.JwtUserDetailsService;
+import sit.int204.backend.services.JwtUserService;
 
 import java.io.IOException;
 
@@ -22,7 +22,7 @@ import java.io.IOException;
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Autowired
-    private JwtUserDetailsService jwtUserDetailsService;
+    private JwtUserService jwtUserDetailsService;
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
