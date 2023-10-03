@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import sit.int204.backend.config.JwtTokenProvider;
 import sit.int204.backend.config.JwtTokenUtil;
 import sit.int204.backend.dtos.*;
 import sit.int204.backend.exception.ResourceNotFoundException;
@@ -27,52 +28,46 @@ public class TokenController {
     @Autowired
     private UserRepository repository;
 
-
 //    Get User Token
+    //1.
+//    @GetMapping("")
+//    public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String oldToken) {
+//        if (oldToken != null && oldToken.startsWith("Bearer ")) {
+//            oldToken = oldToken.substring(7); // ตัด "Bearer " ออกเพื่อให้เหลือแค่ Token
+//            String newToken = jwtService.refreshToken(oldToken);
+//
+//            if (newToken != null) {
+//                   return new ResponseEntity<>(newToken, HttpStatus.OK);
+//            }
+//        }
+//        return new ResponseEntity<>("Failed to refresh token", HttpStatus.UNAUTHORIZED);
+////        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Failed to refresh token");
+//    }
+
+    //2.
     @GetMapping("")
-    public ResponseEntity<String> refreshToken(@RequestHeader("Authorization") String oldToken) {
+    public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String oldToken) {
         if (oldToken != null && oldToken.startsWith("Bearer ")) {
             oldToken = oldToken.substring(7); // ตัด "Bearer " ออกเพื่อให้เหลือแค่ Token
-            String newToken = jwtService.refreshToken(oldToken);
+            ResponseEntity<?> newToken = jwtService.refreshToken(oldToken);
 
             if (newToken != null) {
                 return new ResponseEntity<>(newToken, HttpStatus.OK);
             }
         }
-
-        return new ResponseEntity<>("Failed to refresh token", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("Failed to refresh token", HttpStatus.UNAUTHORIZED);
+    //        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Failed to refresh token");
     }
 
 
-// Create User Token
-//    @PostMapping("")
-//    public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
-//        try {
-//            authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
-//        }catch (ResponseStatusException status){
-//            if (status.getStatusCode() == HttpStatus.NOT_FOUND){
-//                return ResponseEntity.status(404).body("Not found!!!");
-//            }else {
-//                return ResponseEntity.status(401).body("User unauthorized!!!");
-//            }
-//        }
-//        final UserDetails userDetails = jwtService
-//                .loadUserByUsername(authenticationRequest.getUsername());
-//
-//        final String token = jwtTokenUtil.generateToken(userDetails);
-//
-//        return ResponseEntity.ok(new JwtResponse(token));
-//
-//    }
-
 
     @PostMapping("")
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws ResponseStatusException {
         try {
             authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
         } catch (ResponseStatusException status) {
             if (status.getStatusCode() == HttpStatus.NOT_FOUND) {
-                return ResponseEntity.status(404).body("Not found!!!");
+                return ResponseEntity.status(404).body("Not found user!!!");
             } else {
                 return ResponseEntity.status(401).body("User unauthorized!!!");
             }
@@ -89,12 +84,11 @@ public class TokenController {
     private void authenticate(String username, String password) throws ResponseStatusException{
           sit.int204.backend.entities.User user = repository.findUserByUsername(username);
           if(user == null){
-              throw new ResourceNotFoundException("User not found!!");
+              throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!!");
           }
           if (!Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8().matches(password.trim(), user.getPassword())) {
               throw new UnauthorizedException("User not authorized!!");
             }
-
     }
 
 
