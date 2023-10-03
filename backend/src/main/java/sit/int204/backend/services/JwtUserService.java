@@ -1,22 +1,19 @@
 package sit.int204.backend.services;
 
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.server.ResponseStatusException;
 import sit.int204.backend.config.JwtTokenProvider;
-import sit.int204.backend.exception.ResourceNotFoundException;
+import sit.int204.backend.dtos.JwtResponse;
 import sit.int204.backend.repositories.UserRepository;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+
 
 @Service
 public class JwtUserService implements UserDetailsService {
@@ -27,26 +24,47 @@ public class JwtUserService implements UserDetailsService {
     private JwtTokenProvider jwtTokenProvider;
 
     //called User Token
-    public String refreshToken(String oldToken) {
-        // 1. ดึงข้อมูลผู้ใช้จาก oldToken โดยตรง
-        String username = jwtTokenProvider.getUsernameFromToken(oldToken);
+    //1.
+//    public String refreshToken(String oldToken) {
+//        // 1. ดึงข้อมูลผู้ใช้จาก oldToken โดยตรง
+//        String username = jwtTokenProvider.getUsernameFromToken(oldToken);
+//
+//        // 2. สร้าง Token ใหม่ (Refresh Token) โดยใช้ข้อมูลผู้ใช้จาก oldToken
+//        String newToken = jwtTokenProvider.generateToken(username);
+//
+//        return newToken;
+//    }
 
-        // 2. สร้าง Token ใหม่ (Refresh Token) โดยใช้ข้อมูลผู้ใช้จาก oldToken
-        String newToken = jwtTokenProvider.generateToken(username);
+    //2.
 
-        return newToken;
+    public ResponseEntity<?> refreshToken(String oldToken) {
+        if (oldToken != null && oldToken.startsWith("Bearer ")) {
+            oldToken = oldToken.substring(7); // ตัด "Bearer " ออกเพื่อให้เหลือแค่ Token
+            String newToken = jwtTokenProvider.generateToken(jwtTokenProvider.getUsernameFromToken(oldToken));
+
+            if (newToken != null) {
+//                return ResponseEntity<>(new JwtResponse(oldToken,newToken),HttpStatus.UNAUTHORIZED);
+                return new ResponseEntity<>(newToken, HttpStatus.UNAUTHORIZED);
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body("Failed to refresh token");
+
     }
+
+
 
     //create User Token
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         sit.int204.backend.entities.User user = repository.findUserByUsername(username);
         if (user == null) {
-            throw new ResourceNotFoundException("User not found");
+            throw new UsernameNotFoundException( "User not found");
         } else {
             return new User(username, user.getPassword(), new ArrayList<>());
         }
     }
+
 
 }
 
