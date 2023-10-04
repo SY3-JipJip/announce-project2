@@ -29,34 +29,20 @@ public class TokenController {
     private UserRepository repository;
 
 //    Get User Token
-    //1.
-//    @GetMapping("")
-//    public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String oldToken) {
-//        if (oldToken != null && oldToken.startsWith("Bearer ")) {
-//            oldToken = oldToken.substring(7); // ตัด "Bearer " ออกเพื่อให้เหลือแค่ Token
-//            String newToken = jwtService.refreshToken(oldToken);
-//
-//            if (newToken != null) {
-//                   return new ResponseEntity<>(newToken, HttpStatus.OK);
-//            }
-//        }
-//        return new ResponseEntity<>("Failed to refresh token", HttpStatus.UNAUTHORIZED);
-////        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Failed to refresh token");
-//    }
-
     //2.
     @GetMapping("")
     public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String oldToken) {
         if (oldToken != null && oldToken.startsWith("Bearer ")) {
             oldToken = oldToken.substring(7); // ตัด "Bearer " ออกเพื่อให้เหลือแค่ Token
-            ResponseEntity<?> newToken = jwtService.refreshToken(oldToken);
+            String username = jwtTokenUtil.getUsernameFromToken(oldToken);
+            final UserDetails userDetails = jwtService.loadUserByUsername(username);
+            final String token = jwtTokenUtil.generateToken(userDetails);
 
-            if (newToken != null) {
-                return new ResponseEntity<>(newToken, HttpStatus.OK);
+            if (token != null) {
+                return ResponseEntity.ok(new JwtResponse(token, "false"));
             }
         }
         return new ResponseEntity<>("Failed to refresh token", HttpStatus.UNAUTHORIZED);
-    //        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Failed to refresh token");
     }
 
 
@@ -75,7 +61,7 @@ public class TokenController {
 
         final UserDetails userDetails = jwtService.loadUserByUsername(authenticationRequest.getUsername());
 
-        final String token = jwtTokenUtil.generateRefreshToken(userDetails);
+        final String token = jwtTokenUtil.generateToken(userDetails);
         final String refreshToken = jwtTokenUtil.generateRefreshToken(userDetails); // เพิ่มการสร้าง refreshToken
 
         return ResponseEntity.ok(new JwtResponse(token, refreshToken));
