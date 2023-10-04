@@ -162,7 +162,7 @@ if (isUniqueEmail) {
 </script>
  
 <template>
-<div class="sm:ml-64 p-5">
+<div class="w-full h-full">
 
     <form @submit.prevent="submit" class="border border-2">
     <div class="w-full flex flex-row items-center">

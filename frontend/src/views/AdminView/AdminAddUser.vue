@@ -213,7 +213,7 @@ const submit = async () => {
  
 <template>
     
-<div class="sm:ml-64 p-5">
+<div class="w-full h-full">
 
     <div class="border border-2 w-full">
 

@@ -11,7 +11,11 @@ import AdminAddUser from '../views/AdminView/AdminAddUser.vue'
 import AdminEditUser from '../views/AdminView/AdminEditUser.vue' 
 import AdminDeleteUser from '../views/AdminView/AdminDeleteUser.vue' 
 import MatchPassword from '../views/AdminView/MatchPassword.vue'
+import LoginView from '../views/LoginView.vue'
+import { app } from '../main'
+import { getNewToken } from '../composable/getToken'
 
+const tokenExp = Number(import.meta.env.VITE_ACCESS_TOKEN_EXP)
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -75,8 +79,24 @@ const router = createRouter({
       path: '/admin/user/match',
       name: 'MatchPassword',
       component: MatchPassword
-    }
+    },
+    {
+      path : '/login',
+      name : 'login',
+      component : LoginView
+    },
   ]
 })
 
+router.beforeEach(async(to, from, next) => {
+  if(to.path !== '/login' && (app.$cookies.get("token") === null && app.$cookies.get("refreshToken") === null)){
+    next('/login')
+  }else if(to.path !== '/login' && (app.$cookies.get("token") === null && app.$cookies.get("refreshToken") !== null)){
+    app.$cookies.set("token",await getNewToken(app.$cookies.get("refreshToken")),tokenExp)
+    next()
+  }else{
+    next()
+  }
+
+})
 export default router

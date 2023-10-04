@@ -2,7 +2,6 @@
 import { ref, onMounted,computed } from 'vue';
 import { useRouter } from 'vue-router'
 import { getCategories } from '../composable/getCategories';
-
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const router = useRouter()
 
@@ -98,7 +97,7 @@ const submit = async()=>{
 </script>
  
 <template>
-<div  class="p-4 sm:ml-64 flex flex-col">
+<div  class="p-4 w-full h-full flex flex-col">
 
 
     <!-- Add Announcement Title -->

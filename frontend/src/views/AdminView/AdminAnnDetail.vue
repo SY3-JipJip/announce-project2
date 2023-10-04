@@ -38,7 +38,7 @@ const editAnnouncement = (announcementId) =>{
 </script>
 
 <template>
-     <div class="sm:ml-64">
+     <div class="w-full h-full">
        
         <div class="flex w-full">
 

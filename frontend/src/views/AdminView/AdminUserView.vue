@@ -38,7 +38,7 @@ const deleteUser = async (userId) =>{
 </script>
  
 <template>
-<div class="p-4 sm:ml-64 flex flex-col">
+<div class="p-4 w-full h-full flex flex-col">
 
     <div class="w-full flex justify-center text-3xl mb-5 mt-3">
         <img class="h-10 mr-2" src="../../assets/images/management.png"/>

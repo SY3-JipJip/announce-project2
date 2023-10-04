@@ -46,7 +46,7 @@ const deleteAnnouncement = async (announcementId) =>{
 
 </script>
 <template>
-   <div class="sm:ml-64">
+   <div class="w-full h-full">
     <div class="w-full m-2 flex flex-row">
       
           <!-- DateTime of Local User -->

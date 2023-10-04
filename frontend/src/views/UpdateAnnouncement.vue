@@ -176,7 +176,7 @@ const submit = async () =>{
 </script>
  
 <template>
-<div class="p-4 sm:ml-64">
+<div class="p-4 w-full h-full">
 
 <div class="w-full h-full flex flex-col" >
 
