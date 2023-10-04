@@ -3,10 +3,15 @@
 <template>
   <div class="w-full flex flex-col md:flex-row items-center justify-between bg-blue-900 text-white">
     
-   
-        <router-link :to="{ name: 'home'}">
+ 
+   <div class="flex">
+    <img src="../assets//images//announce.png" class="h-12 pt-3 pl-10"/>
+    <router-link :to="{ name: 'home'}">
           <h1 class="text-center p-4 text-2xl font-bold" style="text-shadow: 2px 2px 4px #000000">SIT Announcement System (SAS)</h1>
         </router-link>
+   </div>
+       
+        
     <ul class="flex space-x-4 font-medium">
       <li>
         <router-link :to="{ name: 'home'}" class="ann-menu flex items-center p-2 rounded-lg dark:text-white hover:text-gray-300 dark:hover:bg-gray-700 group">
