@@ -24,31 +24,19 @@ public class JwtUserService implements UserDetailsService {
     private JwtTokenProvider jwtTokenProvider;
 
     //called User Token
-    //1.
-//    public String refreshToken(String oldToken) {
-//        // 1. ดึงข้อมูลผู้ใช้จาก oldToken โดยตรง
-//        String username = jwtTokenProvider.getUsernameFromToken(oldToken);
-//
-//        // 2. สร้าง Token ใหม่ (Refresh Token) โดยใช้ข้อมูลผู้ใช้จาก oldToken
-//        String newToken = jwtTokenProvider.generateToken(username);
-//
-//        return newToken;
-//    }
-
     //2.
-
     public ResponseEntity<?> refreshToken(String oldToken) {
         if (oldToken != null && oldToken.startsWith("Bearer ")) {
             oldToken = oldToken.substring(7); // ตัด "Bearer " ออกเพื่อให้เหลือแค่ Token
             String newToken = jwtTokenProvider.generateToken(jwtTokenProvider.getUsernameFromToken(oldToken));
 
             if (newToken != null) {
-//                return ResponseEntity<>(new JwtResponse(oldToken,newToken),HttpStatus.UNAUTHORIZED);
-                return new ResponseEntity<>(newToken, HttpStatus.UNAUTHORIZED);
+//                return ResponseEntity.ok(new JwtResponse(oldToken,newToken));
+                return new ResponseEntity<>(newToken, HttpStatus.OK);
             }
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body("Failed to refresh token");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Failed to refresh token");
 
     }
 
