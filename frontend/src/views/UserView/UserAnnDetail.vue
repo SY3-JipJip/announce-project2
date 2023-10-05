@@ -2,19 +2,26 @@
 import {ref, onMounted } from 'vue';
 import { useRoute ,useRouter } from 'vue-router'
 import { formatDate } from '../../composable/formatDate'
-
+import { inject } from 'vue'
+const $cookies = inject('$cookies')
+const token = ref('')
 const router = useRouter()
 const { params } = useRoute()
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const announcementDetail = ref([])
 
-onMounted(()=>{
-    loadDetail()
+onMounted(async()=>{
+    token.value = "Bearer " + $cookies.get("token")
+    await loadDetail(token.value)
 })
 
 const loadDetail = async () =>{
     try {
-        const res = await fetch(`${API_ROOT}/api/announcements/${params.id}`)
+        const res = await fetch(`${API_ROOT}/api/announcements/${params.id}`,{
+      headers:{
+        'Authorization': token.value
+      }}
+        )
         if(!res.ok){
             alert('The request page is not available')
             router.push({

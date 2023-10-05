@@ -1,10 +1,10 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRoute ,useRouter } from 'vue-router'
-import { getUsers } from '../../composable/getUsers';
-import { getUserById } from '../../composable/getUserById'
 import { formatDate } from '../../composable/formatDate'
-
+import { inject } from 'vue'
+const $cookies = inject('$cookies')
+const token = ref('')
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const { params } = useRoute()
 const router = useRouter()
@@ -29,8 +29,9 @@ const userDetail = ref([])
 
 
 onMounted(async () => {
-    userDetail.value = await getUserById(params.id);
-    userDatas.value = await getUsers()
+    token.value = "Bearer " + $cookies.get("token")
+    userDetail.value = await getUserById(params.id,token.value);
+    userDatas.value = await getUsers(token.value)
 
     oldData.value = {
             "username": userDetail.value.username,
@@ -45,17 +46,49 @@ onMounted(async () => {
 
 })
 
-
-
-const uniqueRoles = computed(() => {
-    const rolesSet = new Set();
-
-    for (const user of userDatas.value) {
-        rolesSet.add(user.role);
+const getUsers = async (token) => {
+    try {
+        const res = await fetch(API_ROOT+"/api/users",{
+            headers:{
+            'Authorization': token.value
+      },
+        })
+        // if(res.status===201)        
+        if (res.ok) {
+            const userData = res.json()
+            return userData     
+        } 
+            else throw new error('Error, cannot get data!')
+    } catch (error) {
+        console.log(error)
     }
+}
 
-    return Array.from(rolesSet);
-});
+const getUserById = async (userId,token) => {
+  return await fetch(`${API_ROOT}/api/users/${userId}`,{
+    headers:{
+      'Authorization': token
+    },
+  })
+    .then((res) => {
+      if (!res.ok) {
+        alert('The requested page is not available');
+        router.push({
+          name: 'AdminUserView'
+        });
+        throw new Error(res.status);
+      } else {
+        return res.json();
+      }
+    })
+    .then((data) => {
+      return data; // Return the fetched data
+    })
+    .catch((err) => err);
+};
+
+
+const roles = ["admin","announcer"]
 
 
 
@@ -80,7 +113,7 @@ const edittingUser = computed(()=>{
 
 
 //
-const submit = async () => {
+const submit = async (token) => {
     const result = confirm('The data will be changed!! Are you sure?');
 
     if (result) {
@@ -102,8 +135,9 @@ const submit = async () => {
                 const response = await fetch(API_ROOT + '/api/users/' + params.id, {
                     method: "PUT",
                     headers: {
-                        "Content-Type": "application/json"
-                    },
+                            "Content-Type": "application/json",
+                            'Authorization' : token
+                        },
                     body: JSON.stringify(data)
                 });
 
@@ -162,7 +196,7 @@ if (isUniqueEmail) {
 </script>
  
 <template>
-<div class="w-full h-full">
+<div class="sm:ml-64">
 
     <form @submit.prevent="submit" class="border border-2">
     <div class="w-full flex flex-row items-center">
@@ -204,7 +238,7 @@ if (isUniqueEmail) {
         <div class="form-control w-full max-w-xs detail">
             <p>Role</p>
             <select name="role" class="ann-role rounded-md p-1 border-4 border-blue-900" v-model="userDetail.role">
-                <option v-for="role in uniqueRoles" :value="role">{{ role }}</option>
+                <option v-for="role in roles" :value="role">{{ role }}</option>
             </select>
         </div>
 
@@ -215,7 +249,7 @@ if (isUniqueEmail) {
     </div>
 
     <div class="flex justify-center">
-        <button class="ann-button ann-submit ml-10 btn bg-green-600 pl-5 pr-5">submit</button>
+        <button @click="submit(token)" class="ann-button ann-submit ml-10 btn bg-green-600 pl-5 pr-5">submit</button>
         <button @click="cancle()" class="ann-button ml-5 mb-6 btn buttonCancle" >Cancle</button>
     </div>
 </form>

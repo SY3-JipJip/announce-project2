@@ -1,9 +1,18 @@
 <script setup >
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+
+//ใช้ในการนำเข้าฟังก์ชัน inject จาก Vue 3 เพื่อใช้ $cookies เพื่อจัดการคุกกี้ในแอปพลิเคชัน.
 import { inject } from 'vue'
+//ใช้ inject เพื่อสร้างตัวแปร $cookies ซึ่งเป็นตัวอ้างอิงไปยังการจัดการคุกกี้ในแอปพลิเคชันของคุณ.
 const $cookies = inject('$cookies')
-const FETCH_API = import.meta.env.VITE_API
+//ใช้ในการสร้างค่าคงที่ tokenExp ซึ่งมีค่าเท่ากับ VITE_ACCESS_TOKEN_EXP จาก environment ของโมดูล 
+const tokenExp = Number(import.meta.env.VITE_ACCESS_TOKEN_EXP)
+//ใช้ในการสร้างค่าคงที่ refresTokenExp ซึ่งมีค่าเท่ากับ VITE_REFRESH_TOKEN_EXP จาก environment ของโมดูล 
+const refresTokenExp = Number(import.meta.env.VITE_REFRESH_TOKEN_EXP)
+
+
+const FETCH_API = import.meta.env.VITE_API_ROOT
 const router = useRouter()
 const username = ref('')
 const password = ref('')
@@ -11,13 +20,13 @@ const statusCode = ref(0)
 const errText = ref('')
 const activeClass = ref(false)
 const className = ref('')
-const tokenExp = Number(import.meta.env.VITE_TOKEN_EXP)
-const refresTokenExp = Number(import.meta.env.VITE_REFRESHTOKEN_EXP)
 const warning = ref(false)
+
+
 const login = async () =>{
   let user = {
     username : username.value.trim(),
-    password : password.value.trim() ?? ''
+    password : password.value.trim()
   }
   try {
         const res = await fetch(FETCH_API + '/api/token',{
@@ -27,19 +36,22 @@ const login = async () =>{
                     },
                     body: JSON.stringify(user)
                   })
+
+         //เข้าสู่ระบบเสร็จสมบูรณ์ ตั้งค่าคุกกี้ "token" และ "refreshToken" ด้วย $cookies.set() และนำทางผู้ใช้ไปยังหน้า "api/admin/announcement" ด้วย router.push().         
         if(res.status === 200){
           statusCode.value = 200
           errText.value = 'Login Successfully'
           activeClass.value = true
           className.value = 'alert-success'
-
           const data = await res.json()
           $cookies.set("token",data.token,tokenExp)
           $cookies.set("refreshToken",data.refreshToken,refresTokenExp)
-          router.push('api/admin/announcement')
+          router.push('/admin/announcement')
+
         }else if(res.status === 404){
           statusCode.value = 404
           errText.value = 'A user with the specified username DOES NOT exist'
+          console.log("404")
           activeClass.value = true
           className.value = 'alert-error'
         }else if(res.status === 401){
@@ -57,9 +69,8 @@ const login = async () =>{
 </script>
 <template>
     <div class="w-full h-full">
-
-      <div class="flex flex-col w-full h-full mt-20 flex justify-center items-center drop-shadow-xl">
-        <div class="w-full bg-white rounded-lg shadow dark:border w-2/5 dark:bg-gray-800 dark:border-gray-700">
+      <div class="flex flex-col w-full h-full mt-32 flex justify-center items-center drop-shadow-xl">
+        <div class="w-1/2 bg-white rounded-lg shadow dark:border w-2/5 dark:bg-gray-800 dark:border-gray-700">
           
             <div class="p-6 space-y-4 md:space-y-6 sm:p-10">
 

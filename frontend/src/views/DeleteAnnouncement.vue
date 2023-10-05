@@ -5,17 +5,23 @@ const router = useRouter()
 const { params } = useRoute()
 const API_ROOT= import.meta.env.VITE_API_ROOT
 const announcementDetail = ref([])
-
+import { inject } from 'vue'
+const $cookies = inject('$cookies')
+const token = ref('')
 onMounted(async()=>{
- deleteAnnouncement()
+  token.value = "Bearer " + $cookies.get("token")
+  deleteAnnouncement(token.value)
 })
 
 
-const deleteAnnouncement = async () =>{
+const deleteAnnouncement = async (token) =>{
   const confirmed = window.confirm('Do you want to delete');
   if (confirmed) {
     try {
       const res = await fetch(`${API_ROOT}/api/announcements/${params.id}`,{
+        headers:{
+        'Authorization': token
+      },
         method:'DELETE'
       })
       if(res.ok){

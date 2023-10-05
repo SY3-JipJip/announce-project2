@@ -2,21 +2,29 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router'
 import { formatDate } from '../../composable/formatDate'
-
+import { inject } from 'vue'
+const $cookies = inject('$cookies')
+const token = ref('')
 const announcementData = ref([])
-
 const router = useRouter()
 
 const API_ROOT = import.meta.env.VITE_API_ROOT
 
 onMounted(async()=>{
-  announcementData.value = await loadData()
+  token.value = "Bearer " + $cookies.get("token")
+  console.log(token.value)
+  announcementData.value = await loadData(token.value)
 })
 
-const loadData = async() => {
+const loadData = async(token) => {
   try{
-    const res = await fetch(API_ROOT+"/api/announcements")
+    const res = await fetch(API_ROOT+"/api/announcements",{
+    headers:{
+      'Authorization': token
+    }
+  })
     if(res.ok){
+      
       const data = await res.json()
       return data
     }else{
@@ -46,8 +54,8 @@ const deleteAnnouncement = async (announcementId) =>{
 
 </script>
 <template>
-   <div class="w-full h-full">
-    <div class="w-full m-2 flex flex-row">
+   <div class="sm:ml-64">
+    <div class="m-2 flex flex-row">
       
           <!-- DateTime of Local User -->
           <div class="flex w-full text-lg font-semibold p-2 items-center">

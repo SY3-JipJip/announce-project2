@@ -2,7 +2,9 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute ,useRouter } from 'vue-router'
 import { convertDate, convertTime } from '../composable/formatDate.js'
-import { getCategories } from '../composable/getCategories';
+import { inject } from 'vue'
+const $cookies = inject('$cookies')
+const token = ref('')
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const { params } = useRoute()
 const router = useRouter()
@@ -26,8 +28,9 @@ const displays = {
 //ข้อมูลของ Announcement ทั้งหมด ที่ไป fetch มาจาก back
 let announcementDetail = ref({})
 onMounted(async ()=>{
-    await loadDetail()
-    categories.value = await getCategories()
+    token.value = "Bearer " + $cookies.get("token")
+    await loadDetail(token.value)
+    categories.value = await getCategories(token.value)
     //เราต้องแปลงเวลา ที่เป็น format UTC ให้กลายเป็น format time กับ date แยกกัน
     if(announcementDetail.value.publishDate !== null){
         pDate.value = convertDate(announcementDetail.value.publishDate)
@@ -53,9 +56,32 @@ onMounted(async ()=>{
 
 })
 
+const getCategories = async (token) => {
+    try {
+        const res = await fetch(API_ROOT+"/api/categories",{
+            headers:{
+                'Authorization': token
+              }
+        })
+        
+        // if(res.status===201)        
+        if (res.ok) {
+            const categories = res.json()
+            return categories       
+        } 
+            else throw new error('Error, cannot get data!')
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 //Get Announcement By ID
-const loadDetail = async () =>{
-    return await fetch(`${API_ROOT}/api/announcements/AnnCatId/${params.id}`)
+const loadDetail = async (token) =>{
+    return await fetch(`${API_ROOT}/api/announcements/AnnCatId/${params.id}`,{
+    headers:{
+      'Authorization': token
+    }
+    })
     .then(res => {
         if(!res.ok){
             alert('The request page is not available')
@@ -120,7 +146,7 @@ const edittingAnnouncement = computed(()=>{
 })
 
 //
-const submit = async () =>{
+const submit = async (token) =>{
 
     let publishDateTime = null
     let closeDateTime = null
@@ -152,6 +178,7 @@ const submit = async () =>{
         method : "PUT",
         headers: {
         "Content-Type": "application/json",
+        'Authorization' : token
         },
         body: JSON.stringify({
         "announcementTitle": edittingAnnouncement.value.announcementTitle,
@@ -176,7 +203,7 @@ const submit = async () =>{
 </script>
  
 <template>
-<div class="p-4 w-full h-full">
+<div class="p-4 sm:ml-64">
 
 <div class="w-full h-full flex flex-col" >
 

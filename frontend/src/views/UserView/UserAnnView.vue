@@ -3,6 +3,9 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router'
 import { formatDate } from '../../composable/formatDate'
 import { userAnnouncement } from '../../Store/userMode'
+import { inject } from 'vue'
+const $cookies = inject('$cookies')
+const token = ref('')
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const router = useRouter()
 
@@ -10,38 +13,45 @@ const router = useRouter()
 const userAnn = userAnnouncement()
 const isActive =ref()
 
-const changeMode = async () =>{
-  isActive.value = userAnn.setMode()
-  if(isActive.value){
-    await getActiveAnnouncements()
-  }else{
-    await getClosedAnnouncements()
-  }
-  console.log(isActive.value)
-}
-
-
 //data from backend
 const announcementData = ref({})
 
 
 onMounted(async ()=>{
+  token.value = "Bearer " + $cookies.get("token")
   //get ค่า active มาว่าเป็น จริงหรือเท็จ
   isActive.value = userAnn.getMode()
   // console.log(isActive.value)
 
   //ถ้าเป็นจริงก็จะดึงข้อมูลที่อยู่สถานะ active
   if(isActive.value){
-    await getActiveAnnouncements()
+    await getActiveAnnouncements(token.value)
   //ถ้าเป็นเท็จก็จะดึงข้อมูลที่อยู่สถานะ close
   }else{
-    await getClosedAnnouncements()
+    await getClosedAnnouncements(token.value)
   }
 })
 
-const getActiveAnnouncements = async () =>{
+const changeMode = async () =>{
+  isActive.value = userAnn.setMode()
+  if(isActive.value){
+    await getActiveAnnouncements(token.value)
+  }else{
+    await getClosedAnnouncements(token.value)
+  }
+  console.log(isActive.value)
+}
+
+
+
+
+const getActiveAnnouncements = async (token) =>{
     try {
-      const res = await fetch(API_ROOT+'/api/announcements?mode=active')
+      const res = await fetch(API_ROOT+'/api/announcements?mode=active',{
+        headers :{
+        'Authorization': token.value
+      }
+      })
       if(res.ok){
         announcementData.value = await res.json()
       }else{
@@ -54,7 +64,11 @@ const getActiveAnnouncements = async () =>{
 
 const getClosedAnnouncements = async () =>{
     try {
-      const res = await fetch(API_ROOT+'/api/announcements?mode=close')
+      const res = await fetch(API_ROOT+'/api/announcements?mode=close',{
+        headers :{
+        'Authorization': token.value
+      }
+      })
       if(res.ok){
         announcementData.value = await res.json()
       }else{

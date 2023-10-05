@@ -1,5 +1,5 @@
 import router from '../router'
-const FETCH_API = import.meta.env.VITE_API
+const FETCH_API = import.meta.env.VITE_API_ROOT
 const getNewToken = async (refreshToken) =>{
   try{
     const res = await fetch(`${FETCH_API+'/api/token'}`,{

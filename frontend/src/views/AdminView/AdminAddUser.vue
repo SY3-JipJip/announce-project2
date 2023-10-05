@@ -1,16 +1,36 @@
 <script setup>
 import { ref, onMounted,computed } from 'vue';
 import { useRouter } from 'vue-router'
-import { getUsers } from '../../composable/getUsers';
+import {inject} from 'vue'
+const $cookies = inject('$cookies')
+const token = ref('')
 const oldUsers = ref([])
 onMounted(async()=>{
-    oldUsers.value = await getUsers()
-    console.log(oldUsers.value[0].name)
+    token.value = "Bearer " + $cookies.get("token")
+    oldUsers.value = await getUsers(token)
 })
 
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const router = useRouter()
 
+
+const getUsers = async (token) => {
+    try {
+        const res = await fetch(API_ROOT+"/api/users",{
+            headers:{
+            'Authorization': token
+      },
+        })
+        // if(res.status===201)        
+        if (res.ok) {
+            const userData = res.json()
+            return userData     
+        } 
+            else throw new error('Error, cannot get data!')
+    } catch (error) {
+        console.log(error)
+    }
+}
 //VALUE V-MODEL
 const username = ref('')
 const password = ref('')
@@ -165,7 +185,7 @@ const enableAdd = computed(()=>{
 
 
 //ถ้ากดปุ่ม submit ก็จะมี POP UP ถามก่อนว่า จะ submit จริงไหม ถ้าจริงก็จะทำตามที่เขียนข้างล่าง
-const submit = async () => {
+const submit = async (token) => {
     const newUser = {
         username: username.value.trim(),
         password: password.value.trim(),
@@ -178,9 +198,10 @@ const submit = async () => {
         // ทำการ POST ข้อมูลใหม่ไปยัง API
         const response = await fetch(API_ROOT + '/api/users', {
             method: 'POST',
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers : {
+            "Content-Type": "application/json",
+            'Authorization': token
+        },
             body: JSON.stringify(newUser)
         });
 
@@ -213,7 +234,7 @@ const submit = async () => {
  
 <template>
     
-<div class="w-full h-full">
+<div class="sm:ml-64">
 
     <div class="border border-2 w-full">
 

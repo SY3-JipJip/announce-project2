@@ -1,6 +1,8 @@
 <script setup>
-import {ref} from 'vue'
-
+import {ref,onMounted} from 'vue'
+import { inject } from 'vue'
+const $cookies = inject('$cookies')
+const token = ref('')
 const username = ref('')
 const password = ref('')
 const alertText = ref('')
@@ -8,18 +10,23 @@ const className = ref('')
 const warning = ref(false)
 const statusCode = ref(0)
 const API_ROOT = import.meta.env.VITE_API_ROOT
-const match = async()=>{
+onMounted(async () => {
+    token.value = "Bearer " + $cookies.get("token")
+    console.log(token.value)
+})
+const match = async(token)=>{
     let userInfo = {
         username : username.value.trim(),
         password : password.value.trim()
     }
     try{
         const res = await fetch(API_ROOT + '/api/users/match',{
-            method : "POST",
-            headers : {
-                "Content-type" : "application/json"
-            },
-            body: JSON.stringify(userInfo)
+                method: "POST",      
+                headers: {
+                    "Content-Type": "application/json",
+                    'Authorization': token
+                        },
+                body: JSON.stringify(userInfo)
         })
         if(res.status === 200){
             statusCode.value = 200
@@ -43,7 +50,7 @@ const match = async()=>{
 </script>
  
 <template>
-<div class="p-4 w-full h-full">
+<div class="p-4 sm:ml-64">
 <div class="w-full h-full">
     <section class="bg-gray-50 dark:bg-gray-900">
   <div class="flex flex-col items-center justify-center h-full mt-16 w-full">

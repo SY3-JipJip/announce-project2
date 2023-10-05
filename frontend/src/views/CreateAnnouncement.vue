@@ -1,18 +1,38 @@
 <script setup>
 import { ref, onMounted,computed } from 'vue';
 import { useRouter } from 'vue-router'
-import { getCategories } from '../composable/getCategories';
+import { inject } from 'vue'
+const $cookies = inject('$cookies')
+const token = ref('')
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const router = useRouter()
 
 //ALL CATEGORIES
 const categories = ref({})
 onMounted(async()=>{
-    categories.value = await getCategories()
+    token.value = "Bearer " + $cookies.get("token")
+    categories.value = await getCategories(token.value)
     
 })
 
-
+const getCategories = async (token) => {
+    try {
+        const res = await fetch(API_ROOT+"/api/categories",{
+            headers:{
+                'Authorization': token
+              }
+        })
+        
+        // if(res.status===201)        
+        if (res.ok) {
+            const categories = res.json()
+            return categories       
+        } 
+            else throw new error('Error, cannot get data!')
+    } catch (error) {
+        console.log(error)
+    }
+}
 //ถ้า USER ไม่กรอกข้อมูล title หรือ category หรือ description ก็จะไม่ยอมให้ กดปุ่ม submit 
 const submitBtn = computed(()=>{
    return title.value.trim().length === 0 || category.value === undefined  || description.value.trim().length === 0
@@ -79,8 +99,9 @@ const submit = async()=>{
         const res = await fetch(API_ROOT+"/api/announcements",{
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json"
-                    },
+                            "Content-Type": "application/json",
+                            'Authorization': token
+                        },
                     body: JSON.stringify(announcementObj.value)
                 })
         if(res.status === 200){
@@ -97,7 +118,7 @@ const submit = async()=>{
 </script>
  
 <template>
-<div  class="p-4 w-full h-full flex flex-col">
+<div  class="p-4 sm:ml-64 flex flex-col">
 
 
     <!-- Add Announcement Title -->
