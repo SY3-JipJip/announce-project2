@@ -1,15 +1,7 @@
 <script setup >
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-
-//ใช้ในการนำเข้าฟังก์ชัน inject จาก Vue 3 เพื่อใช้ $cookies เพื่อจัดการคุกกี้ในแอปพลิเคชัน.
-import { inject } from 'vue'
-//ใช้ inject เพื่อสร้างตัวแปร $cookies ซึ่งเป็นตัวอ้างอิงไปยังการจัดการคุกกี้ในแอปพลิเคชันของคุณ.
-const $cookies = inject('$cookies')
-//ใช้ในการสร้างค่าคงที่ tokenExp ซึ่งมีค่าเท่ากับ VITE_ACCESS_TOKEN_EXP จาก environment ของโมดูล 
-const tokenExp = Number(import.meta.env.VITE_ACCESS_TOKEN_EXP)
-//ใช้ในการสร้างค่าคงที่ refresTokenExp ซึ่งมีค่าเท่ากับ VITE_REFRESH_TOKEN_EXP จาก environment ของโมดูล 
-const refresTokenExp = Number(import.meta.env.VITE_REFRESH_TOKEN_EXP)
+import { storeToken } from '../composable/storeToken';
 
 
 const FETCH_API = import.meta.env.VITE_API_ROOT
@@ -37,15 +29,15 @@ const login = async () =>{
                     body: JSON.stringify(user)
                   })
 
+
          //เข้าสู่ระบบเสร็จสมบูรณ์ ตั้งค่าคุกกี้ "token" และ "refreshToken" ด้วย $cookies.set() และนำทางผู้ใช้ไปยังหน้า "api/admin/announcement" ด้วย router.push().         
         if(res.status === 200){
           statusCode.value = 200
           errText.value = 'Login Successfully'
           activeClass.value = true
           className.value = 'alert-success'
-          const data = await res.json()
-          $cookies.set("token",data.token,tokenExp)
-          $cookies.set("refreshToken",data.refreshToken,refresTokenExp)
+          const token = await res.json()
+          storeToken(token)
           router.push('/admin/announcement')
 
         }else if(res.status === 404){

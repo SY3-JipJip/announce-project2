@@ -1,8 +1,6 @@
 <script setup>
-import {ref,onMounted} from 'vue'
-import { inject } from 'vue'
-const $cookies = inject('$cookies')
-const token = ref('')
+import {ref} from 'vue'
+
 const username = ref('')
 const password = ref('')
 const alertText = ref('')
@@ -10,10 +8,12 @@ const className = ref('')
 const warning = ref(false)
 const statusCode = ref(0)
 const API_ROOT = import.meta.env.VITE_API_ROOT
-onMounted(async () => {
-    token.value = "Bearer " + $cookies.get("token")
-    console.log(token.value)
-})
+
+const getToken = () =>{
+  const token = localStorage.getItem("token")
+  return "Bearer " + token
+}
+
 const match = async(token)=>{
     let userInfo = {
         username : username.value.trim(),
@@ -24,7 +24,7 @@ const match = async(token)=>{
                 method: "POST",      
                 headers: {
                     "Content-Type": "application/json",
-                    'Authorization': token
+                    'Authorization': getToken()
                         },
                 body: JSON.stringify(userInfo)
         })

@@ -2,33 +2,37 @@
 import {ref,onMounted,computed} from 'vue'
 import { formatDate } from '../../composable/formatDate'
 import { useRouter } from 'vue-router'
-import { inject } from 'vue'
-const $cookies = inject('$cookies')
-const token = ref('')
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const router = useRouter()
 
 
 const userData = ref([])
+
+const getToken = () =>{
+  const token = localStorage.getItem("token")
+  return "Bearer " + token
+}
+
 onMounted(async()=>{
-  token.value = "Bearer " + $cookies.get("token")
-  console.log(token.value)
-  userData.value =await getUsers(token.value)
+  userData.value = await getUsers()
 })
 
 
-const getUsers = async (token) => {
+const getUsers = async () => {
     try {
         const res = await fetch(API_ROOT+"/api/users",{
     headers:{
-      'Authorization': token
+      "Content-Type": "application/json",
+      'Authorization': getToken()
     }
   })
         if (res.ok) {
             const userData = res.json()
             return userData     
-        } 
-            else throw new error('Error, cannot get data!')
+        }else if (res.status == 401) {
+          // 401 Unauthorized: รีเริ่มหน้า login
+          router.push({ name: 'login' });
+         }else throw new error('Error, cannot get data!')
     } catch (error) {
         console.log(error)
     }

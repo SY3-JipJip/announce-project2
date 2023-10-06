@@ -2,12 +2,15 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute ,useRouter } from 'vue-router'
 import { convertDate, convertTime } from '../composable/formatDate.js'
-import { inject } from 'vue'
-const $cookies = inject('$cookies')
-const token = ref('')
+
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const { params } = useRoute()
 const router = useRouter()
+
+const getToken = () =>{
+  const token = localStorage.getItem("token")
+  return "Bearer " + token
+}
 
 let old = ref('')
 let pDate = ref('')
@@ -28,9 +31,8 @@ const displays = {
 //ข้อมูลของ Announcement ทั้งหมด ที่ไป fetch มาจาก back
 let announcementDetail = ref({})
 onMounted(async ()=>{
-    token.value = "Bearer " + $cookies.get("token")
-    await loadDetail(token.value)
-    categories.value = await getCategories(token.value)
+    await loadDetail()
+    categories.value = await getCategories()
     //เราต้องแปลงเวลา ที่เป็น format UTC ให้กลายเป็น format time กับ date แยกกัน
     if(announcementDetail.value.publishDate !== null){
         pDate.value = convertDate(announcementDetail.value.publishDate)
@@ -56,11 +58,11 @@ onMounted(async ()=>{
 
 })
 
-const getCategories = async (token) => {
+const getCategories = async () => {
     try {
         const res = await fetch(API_ROOT+"/api/categories",{
             headers:{
-                'Authorization': token
+                'Authorization': getToken()
               }
         })
         
@@ -76,14 +78,19 @@ const getCategories = async (token) => {
 }
 
 //Get Announcement By ID
-const loadDetail = async (token) =>{
+const loadDetail = async () =>{
     return await fetch(`${API_ROOT}/api/announcements/AnnCatId/${params.id}`,{
     headers:{
-      'Authorization': token
+        'Authorization': getToken()
     }
     })
     .then(res => {
         if(!res.ok){
+            if (res.status === 401) {
+                // 401 Unauthorized: รีเริ่มหน้า login
+                router.push({ name: 'login' });
+            }
+            
             alert('The request page is not available')
             router.push({
                 name : 'home'
@@ -146,7 +153,7 @@ const edittingAnnouncement = computed(()=>{
 })
 
 //
-const submit = async (token) =>{
+const submit = async () =>{
 
     let publishDateTime = null
     let closeDateTime = null
@@ -178,7 +185,7 @@ const submit = async (token) =>{
         method : "PUT",
         headers: {
         "Content-Type": "application/json",
-        'Authorization' : token
+        'Authorization' : getToken()
         },
         body: JSON.stringify({
         "announcementTitle": edittingAnnouncement.value.announcementTitle,

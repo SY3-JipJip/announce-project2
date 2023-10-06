@@ -1,36 +1,43 @@
 <script setup>
 import { ref, onMounted,computed } from 'vue';
 import { useRouter } from 'vue-router'
-import {inject} from 'vue'
-const $cookies = inject('$cookies')
-const token = ref('')
+
 const oldUsers = ref([])
 onMounted(async()=>{
-    token.value = "Bearer " + $cookies.get("token")
-    oldUsers.value = await getUsers(token)
+    oldUsers.value = await getUsers()
 })
 
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const router = useRouter()
 
+const getToken = () =>{
+  const token = localStorage.getItem("token")
+  return "Bearer " + token
+}
 
-const getUsers = async (token) => {
+const getUsers = async () => {
     try {
-        const res = await fetch(API_ROOT+"/api/users",{
-            headers:{
-            'Authorization': token
-      },
-        })
-        // if(res.status===201)        
+        const res = await fetch(API_ROOT + "/api/users", {
+            headers: {
+                'Authorization': getToken()
+            }
+        });
+
         if (res.ok) {
-            const userData = res.json()
-            return userData     
-        } 
-            else throw new error('Error, cannot get data!')
+            const userData = await res.json();
+            return userData;
+        } else if (res.status === 401) {
+            // 401 Unauthorized: รีเริ่มหน้า login
+            alert("Please log in!")
+            router.push({ name: 'login' });
+        } else {
+            throw new Error('Error, cannot get data!');
+        }
     } catch (error) {
-        console.log(error)
+        console.log(error);
     }
 }
+
 //VALUE V-MODEL
 const username = ref('')
 const password = ref('')
@@ -185,7 +192,7 @@ const enableAdd = computed(()=>{
 
 
 //ถ้ากดปุ่ม submit ก็จะมี POP UP ถามก่อนว่า จะ submit จริงไหม ถ้าจริงก็จะทำตามที่เขียนข้างล่าง
-const submit = async (token) => {
+const submit = async () => {
     const newUser = {
         username: username.value.trim(),
         password: password.value.trim(),
@@ -200,7 +207,7 @@ const submit = async (token) => {
             method: 'POST',
             headers : {
             "Content-Type": "application/json",
-            'Authorization': token
+            'Authorization': getToken()
         },
             body: JSON.stringify(newUser)
         });

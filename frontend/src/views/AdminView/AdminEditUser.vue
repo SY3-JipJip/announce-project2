@@ -2,9 +2,6 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute ,useRouter } from 'vue-router'
 import { formatDate } from '../../composable/formatDate'
-import { inject } from 'vue'
-const $cookies = inject('$cookies')
-const token = ref('')
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const { params } = useRoute()
 const router = useRouter()
@@ -29,9 +26,8 @@ const userDetail = ref([])
 
 
 onMounted(async () => {
-    token.value = "Bearer " + $cookies.get("token")
-    userDetail.value = await getUserById(params.id,token.value);
-    userDatas.value = await getUsers(token.value)
+    userDetail.value = await getUserById(params.id);
+    console.log(userDetail.value)
 
     oldData.value = {
             "username": userDetail.value.username,
@@ -46,28 +42,18 @@ onMounted(async () => {
 
 })
 
-const getUsers = async (token) => {
-    try {
-        const res = await fetch(API_ROOT+"/api/users",{
-            headers:{
-            'Authorization': token.value
-      },
-        })
-        // if(res.status===201)        
-        if (res.ok) {
-            const userData = res.json()
-            return userData     
-        } 
-            else throw new error('Error, cannot get data!')
-    } catch (error) {
-        console.log(error)
-    }
+const getToken = () =>{
+  const token = localStorage.getItem("token")
+  return "Bearer " + token
 }
 
-const getUserById = async (userId,token) => {
+
+
+const getUserById = async (userId) => {
   return await fetch(`${API_ROOT}/api/users/${userId}`,{
     headers:{
-      'Authorization': token
+      "Content-Type": "application/json",
+      'Authorization': getToken()
     },
   })
     .then((res) => {
@@ -101,7 +87,6 @@ const cancle =()=>{
 
 // ค่าของ edittingAnnouncement ค่าเริ่มต้นจะเป็นของข้อมูลเดิม และเมื่อ user แก้ไข ตัวแปรก็จะเปลี่ยนค่าตามที่ user input ค่าเข้ามา
 const edittingUser = computed(()=>{
-    console.log(edittingUser.value)
     return {
         "username": userDetail.value.username,
         "name": userDetail.value.name,
@@ -113,7 +98,7 @@ const edittingUser = computed(()=>{
 
 
 //
-const submit = async (token) => {
+const submit = async () => {
     const result = confirm('The data will be changed!! Are you sure?');
 
     if (result) {
@@ -121,29 +106,34 @@ const submit = async (token) => {
         const name = String(edittingUser.value.name).trim();
         const email = String(edittingUser.value.email).trim();
         const role = String(edittingUser.value.role).trim();
+
         const data = {
             "username": username,
             "name": name,
             "email": email,
             "role": role
+            
         };
-
         if (JSON.stringify(data) === JSON.stringify(oldData.value)) {
             router.push('/admin/user');
+ 
         }else {
             try {
                 const response = await fetch(API_ROOT + '/api/users/' + params.id, {
                     method: "PUT",
                     headers: {
-                            "Content-Type": "application/json",
-                            'Authorization' : token
-                        },
+                        "Content-Type": "application/json",
+                        'Authorization': getToken(),
+                    },
                     body: JSON.stringify(data)
                 });
 
                 if (response.ok) {
                     alert('Updated user successfully.');
                     router.push('/admin/user');
+                }else if (res.status == 401) {
+                // 401 Unauthorized: รีเริ่มหน้า login
+                router.push({ name: 'login' });
                 }else {
                     const errorData = await response.json();
                     let errorMessage = "Could not update data!!! :";
@@ -249,7 +239,7 @@ if (isUniqueEmail) {
     </div>
 
     <div class="flex justify-center">
-        <button @click="submit(token)" class="ann-button ann-submit ml-10 btn bg-green-600 pl-5 pr-5">submit</button>
+        <button class="ann-button ann-submit ml-10 btn bg-green-600 pl-5 pr-5" type="submit">submit</button>
         <button @click="cancle()" class="ann-button ml-5 mb-6 btn buttonCancle" >Cancle</button>
     </div>
 </form>

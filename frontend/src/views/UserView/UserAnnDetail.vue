@@ -2,39 +2,48 @@
 import {ref, onMounted } from 'vue';
 import { useRoute ,useRouter } from 'vue-router'
 import { formatDate } from '../../composable/formatDate'
-import { inject } from 'vue'
-const $cookies = inject('$cookies')
-const token = ref('')
+
 const router = useRouter()
 const { params } = useRoute()
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const announcementDetail = ref([])
+
+const getToken = () =>{
+  const token = localStorage.getItem("token")
+  return "Bearer " + token
+}
 
 onMounted(async()=>{
     token.value = "Bearer " + $cookies.get("token")
     await loadDetail(token.value)
 })
 
-const loadDetail = async () =>{
+const loadDetail = async () => {
     try {
-        const res = await fetch(`${API_ROOT}/api/announcements/${params.id}`,{
-      headers:{
-        'Authorization': token.value
-      }}
-        )
-        if(!res.ok){
-            alert('The request page is not available')
-            router.push({
-                name : 'home'
-            })
-            throw new Error(res.status)
-        }else{
-            announcementDetail.value = await res.json()
+        const res = await fetch(`${API_ROOT}/api/announcements/${params.id}`, {
+            headers: {
+                "Content-Type": "application/json",
+                'Authorization': getToken()
+            }
+        });
+
+        if (!res.ok) {
+            if (res.status === 401) {
+                // 401 Unauthorized: รีเริ่มหน้า login
+                router.push({ name: 'login' });
+            } else {
+                alert('The requested page is not available');
+                router.push({ name: 'home' });
+            }
+            throw new Error(res.status);
+        } else {
+            announcementDetail.value = await res.json();
         }
-    }catch(err){
-        errorMSG.value = err
+    } catch (err) {
+        errorMSG.value = err;
     }
 }
+
 
 </script>
 

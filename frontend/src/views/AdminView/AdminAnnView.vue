@@ -2,39 +2,43 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router'
 import { formatDate } from '../../composable/formatDate'
-import { inject } from 'vue'
-const $cookies = inject('$cookies')
-const token = ref('')
 const announcementData = ref([])
 const router = useRouter()
 
 const API_ROOT = import.meta.env.VITE_API_ROOT
 
 onMounted(async()=>{
-  token.value = "Bearer " + $cookies.get("token")
-  console.log(token.value)
-  announcementData.value = await loadData(token.value)
+  announcementData.value = await loadData()
 })
 
-const loadData = async(token) => {
-  try{
-    const res = await fetch(API_ROOT+"/api/announcements",{
-    headers:{
-      'Authorization': token
+const getToken = () =>{
+  const token = localStorage.getItem("token")
+  return "Bearer " + token
+}
+
+const loadData = async () => {
+  try {
+    const res = await fetch(API_ROOT + "/api/announcements", {
+      headers: {
+        'Authorization': getToken(),
+      }
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      return data;
+    } else if (res.status === 401) {
+      // 401 Unauthorized: รีเริ่มหน้า login
+      router.push({ name: 'login' });
+    } else {
+      throw new Error('Could not load data');
     }
-  })
-    if(res.ok){
-      
-      const data = await res.json()
-      return data
-    }else{
-      throw new Error('could not load data')
-    }
-    
+
   } catch (error) {
-    console.log(`ERROR: ${error}`)
+    console.log(`ERROR: ${error}`);
   }
 }
+
 
 const showDescription = (announcementId) =>{
   router.push({

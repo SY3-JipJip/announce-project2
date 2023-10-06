@@ -1,15 +1,16 @@
 <script setup>
 import { useRouter,useRoute } from 'vue-router';
-import {inject} from 'vue'
+
 const router = useRouter()
 const route = useRoute()
-const $cookies = inject('$cookies');
 
-const logout = ()=>{
-  $cookies.remove("token")
-  $cookies.remove("refreshToken")
-  router.push("/login")
+
+const logout = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("refreshToken");
+  router.push("/login");
 }
+
 </script>
 <template>
   <div v-if="!route.fullPath.includes(`/login`)" class="sm:ml-64 flex items-center justify-center bg-blue-900 text-white">

@@ -1,25 +1,28 @@
 <script setup>
 import { ref, onMounted,computed } from 'vue';
 import { useRouter } from 'vue-router'
-import { inject } from 'vue'
-const $cookies = inject('$cookies')
-const token = ref('')
+
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const router = useRouter()
 
 //ALL CATEGORIES
 const categories = ref({})
 onMounted(async()=>{
-    token.value = "Bearer " + $cookies.get("token")
-    categories.value = await getCategories(token.value)
+    categories.value = await getCategories()
     
 })
 
-const getCategories = async (token) => {
+const getToken = () =>{
+  const token = localStorage.getItem("token")
+  return "Bearer " + token
+}
+
+const getCategories = async () => {
     try {
         const res = await fetch(API_ROOT+"/api/categories",{
             headers:{
-                'Authorization': token
+                "Content-Type": "application/json",
+                'Authorization': getToken()
               }
         })
         
@@ -30,7 +33,7 @@ const getCategories = async (token) => {
         } 
             else throw new error('Error, cannot get data!')
     } catch (error) {
-        console.log(error)
+        alert(error)
     }
 }
 //ถ้า USER ไม่กรอกข้อมูล title หรือ category หรือ description ก็จะไม่ยอมให้ กดปุ่ม submit 
@@ -76,45 +79,51 @@ announcementObj.value = {
     }
 
 //ถ้ากดปุ่ม submit ก็จะมี POP UP ถามก่อนว่า จะ submit จริงไหม ถ้าจริงก็จะทำตามที่เขียนข้างล่าง
-const submit = async()=>{
-    let isConfirm = confirm('Confirm to submit ')
-    if (isConfirm) {
+const submit = async () => {
+    let isConfirm = confirm('Confirm to submit ');
 
-        //จะ set ค่าเวลาให้ได้ต้องตรงตามเงื่อนไขดังนี้ ก็คือ publistDate+Time / closeDate+Time ต้องไม่เป็น undefined ถึงจะใช้ toISOString แปลงค่า ถ้าเป็น undefind ก็จะให้เป็น null
-        pDate.value !== undefined && pTime.value !== undefined ? publishDate.value = new Date(`${pDate.value}T${pTime.value}`).toISOString() : publishDate.value = null
-        cDate.value !== undefined && cTime.value !== undefined ? closeDate.value = new Date(`${cDate.value}T${cTime.value}`).toISOString() : closeDate.value = null
-        
-        //ถ้า user ติ๊ก มันจะเป็นค่า true ดังนั้นถ้าเป็น true ก็จะ set ให้เป็นค่า Y ถ้า false ก็จะให้เป็น N
-        display.value ? display.value = displays.yes : display.value = displays.no
-        
+    if (isConfirm) {
+        // ตรวจสอบและกำหนดค่า publishDate และ closeDate ตามเงื่อนไข
+        pDate.value !== undefined && pTime.value !== undefined ? publishDate.value = new Date(`${pDate.value}T${pTime.value}`).toISOString() : publishDate.value = null;
+        cDate.value !== undefined && cTime.value !== undefined ? closeDate.value = new Date(`${cDate.value}T${cTime.value}`).toISOString() : closeDate.value = null;
+
+        // กำหนดค่า display เป็น "Y" หรือ "N" ตามค่าที่ user เลือก
+        display.value ? display.value = displays.yes : display.value = displays.no;
+
         announcementObj.value = {
-        "announcementTitle" : title.value,
-        "announcementDescription"   : description.value,
-        "publishDate"   : publishDate.value,
-        "closeDate" : closeDate.value,
-        "announcementDisplay"   : display.value,
-        "categoryId"  : category.value
-    }
-    try {
-        const res = await fetch(API_ROOT+"/api/announcements",{
-                    method: "POST",
-                    headers: {
-                            "Content-Type": "application/json",
-                            'Authorization': token
-                        },
-                    body: JSON.stringify(announcementObj.value)
-                })
-        if(res.status === 200){
-            const response = await res.json()
-            router.push('/admin/announcement')
-        }else{
-            alert('Could not create this announcement please try again.')
+            "announcementTitle": title.value,
+            "announcementDescription": description.value,
+            "publishDate": publishDate.value,
+            "closeDate": closeDate.value,
+            "announcementDisplay": display.value,
+            "categoryId": category.value
         }
-    } catch (error) {
-        alert(error)
+
+        try {
+            const res = await fetch(API_ROOT + "/api/announcements", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    'Authorization': getToken()
+                },
+                body: JSON.stringify(announcementObj.value)
+            })
+
+            if (res.status === 200) {
+                const response = await res.json()
+                router.push('/admin/announcement')
+            } else if (res.status === 401) {
+                // 401 Unauthorized: เรียกใช้งานการเปลี่ยนเส้นทางไปยังหน้า login
+                router.push({ name: 'login' });
+            } else {
+                alert('Could not create this announcement, please try again.');
+            }
+        } catch (error) {
+            alert(error);
+        }
     }
 }
-}
+
 </script>
  
 <template>
