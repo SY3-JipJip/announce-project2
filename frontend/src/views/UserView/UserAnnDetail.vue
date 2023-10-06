@@ -14,8 +14,7 @@ const getToken = () =>{
 }
 
 onMounted(async()=>{
-    token.value = "Bearer " + $cookies.get("token")
-    await loadDetail(token.value)
+    await loadDetail()
 })
 
 const loadDetail = async () => {
