@@ -79,6 +79,10 @@ const router = createRouter({
       component: MatchPassword
     },
     {
+      path: '/',
+      redirect: '/login',
+    },
+    {
       path : '/login',
       name : 'login',
       component : LoginView
