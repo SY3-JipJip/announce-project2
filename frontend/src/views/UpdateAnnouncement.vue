@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute ,useRouter } from 'vue-router'
 import { convertDate, convertTime } from '../composable/formatDate.js'
-
+import { getNewToken } from '../composable/getNewToken';
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const { params } = useRoute()
 const router = useRouter()
@@ -73,37 +73,38 @@ const getCategories = async () => {
         } 
             else throw new error('Error, cannot get data!')
     } catch (error) {
-        console.log(error)
+        return error
     }
 }
 
 //Get Announcement By ID
-const loadDetail = async () =>{
-    return await fetch(`${API_ROOT}/api/announcements/AnnCatId/${params.id}`,{
-    headers:{
+const loadDetail = async () => {
+  try {
+    const res = await fetch(`${API_ROOT}/api/announcements/AnnCatId/${params.id}`, {
+      headers: {
         'Authorization': getToken()
+      }
+    });
+
+    if (!res.ok) {
+      if (res.status === 401) {
+        // Token is invalid, attempt to refresh it
+        await getNewToken();
+
+        // Retry the `loadDetail` function with the new token
+        return await loadDetail();
+      } else {
+        alert('The requested page is not available');
+        router.push({ name: 'home' });
+        throw new Error(res.status);
+      }
+    } else {
+      const data = await res.json();
+      announcementDetail.value = data;
     }
-    })
-    .then(res => {
-        if(!res.ok){
-            if (res.status === 401) {
-                // 401 Unauthorized: รีเริ่มหน้า login
-                router.push({ name: 'login' });
-            }
-            
-            alert('The request page is not available')
-            router.push({
-                name : 'home'
-            })
-            throw new Error(res.status)
-        }else{
-            return res.json()
-        }
-    })
-    .then(data => {
-        announcementDetail.value = data
-    })
-    .catch((err) => err)
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 

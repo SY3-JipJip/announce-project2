@@ -43,7 +43,6 @@ const login = async () =>{
         }else if(res.status === 404){
           statusCode.value = 404
           errText.value = 'A user with the specified username DOES NOT exist'
-          console.log("404")
           activeClass.value = true
           className.value = 'alert-error'
         }else if(res.status === 401){
@@ -55,6 +54,7 @@ const login = async () =>{
         warning.value = true   
     } catch (error) {
         alert(error)
+        router.push('/login');
     }
 }
 

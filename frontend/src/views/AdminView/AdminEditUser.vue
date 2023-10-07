@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute ,useRouter } from 'vue-router'
 import { formatDate } from '../../composable/formatDate'
+import { getNewToken } from '../../composable/getNewToken';
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const { params } = useRoute()
 const router = useRouter()
@@ -50,28 +51,36 @@ const getToken = () =>{
 
 
 const getUserById = async (userId) => {
-  return await fetch(`${API_ROOT}/api/users/${userId}`,{
-    headers:{
-      "Content-Type": "application/json",
-      'Authorization': getToken()
-    },
-  })
-    .then((res) => {
-      if (!res.ok) {
+  try {
+    const res = await fetch(`${API_ROOT}/api/users/${userId}`, {
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': getToken()
+      },
+    });
+
+    if (!res.ok) {
+      if (res.status === 401) {
+        // Token is invalid, attempt to refresh it
+        await getNewToken();
+
+        // Retry the `getUserById` function with the new token
+        return await getUserById(userId);
+      } else {
         alert('The requested page is not available');
         router.push({
           name: 'AdminUserView'
         });
         throw new Error(res.status);
-      } else {
-        return res.json();
       }
-    })
-    .then((data) => {
-      return data; // Return the fetched data
-    })
-    .catch((err) => err);
+    } else {
+      return await res.json();
+    }
+  } catch (error) {
+    return error
+  }
 };
+
 
 
 const roles = ["admin","announcer"]

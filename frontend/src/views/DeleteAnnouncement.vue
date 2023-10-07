@@ -33,9 +33,6 @@ const deleteAnnouncement = async () => {
                 router.push({
                     name: 'home'
                 });
-            } else if (res.status === 401) {
-                // 401 Unauthorized: เรียกใช้งานการเปลี่ยนเส้นทางไปยังหน้า login
-                router.push({ name: 'login' });
             } else {
                 alert(`There are no announcement with id = ${params.id}`);
                 router.push({

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted,computed } from 'vue';
 import { useRouter } from 'vue-router'
-
+import { getNewToken } from '../../composable/getNewToken';
 const oldUsers = ref([])
 onMounted(async()=>{
     oldUsers.value = await getUsers()
@@ -16,27 +16,40 @@ const getToken = () =>{
 }
 
 const getUsers = async () => {
-    try {
-        const res = await fetch(API_ROOT + "/api/users", {
-            headers: {
-                'Authorization': getToken()
-            }
-        });
+  try {
+    const res = await fetch(API_ROOT + "/api/users", {
+      headers: {
+        'Authorization': getToken()
+      }
+    });
 
-        if (res.ok) {
-            const userData = await res.json();
-            return userData;
-        } else if (res.status === 401) {
-            // 401 Unauthorized: รีเริ่มหน้า login
-            alert("Please log in!")
-            router.push({ name: 'login' });
-        } else {
-            throw new Error('Error, cannot get data!');
+    if (res.ok) {
+      const userData = await res.json();
+      return userData;
+    } else if (res.status === 401) {
+      // Token is invalid, attempt to refresh it
+      await getNewToken();
+
+      // Retry the API request with the new token
+      const res2 = await fetch(API_ROOT + "/api/users", {
+        headers: {
+          'Authorization': getToken()
         }
-    } catch (error) {
-        console.log(error);
+      });
+
+      if (res2.ok) {
+        const userData = await res2.json();
+        return userData;
+      } else {
+        throw new Error('Error, cannot get data even after token refresh!');
+      }
+    } else {
+      throw new Error('Error, cannot get data!');
     }
-}
+  } catch (error) {
+    return error
+  }
+};
 
 //VALUE V-MODEL
 const username = ref('')
@@ -48,7 +61,6 @@ const roles = ["admin","announcer"]
 const name = ref('')
 
 
-const errorMessage = ref('')
 
 
 
@@ -226,7 +238,8 @@ const submit = async () => {
             alert(errorMessage);
         }
     } catch (err) {
-        errorMessage.value = err;
+        alert('Please login');
+        router.push('/login');
     }
 
 };

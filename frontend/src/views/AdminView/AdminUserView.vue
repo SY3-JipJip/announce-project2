@@ -2,6 +2,7 @@
 import {ref,onMounted,computed} from 'vue'
 import { formatDate } from '../../composable/formatDate'
 import { useRouter } from 'vue-router'
+import { getNewToken } from '../../composable/getNewToken';
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const router = useRouter()
 
@@ -19,24 +20,44 @@ onMounted(async()=>{
 
 
 const getUsers = async () => {
-    try {
-        const res = await fetch(API_ROOT+"/api/users",{
-    headers:{
-      "Content-Type": "application/json",
-      'Authorization': getToken()
+  const router = useRouter();
+
+  try {
+    const res = await fetch(API_ROOT + "/api/users", {
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': getToken()
+      }
+    });
+
+    if (res.ok) {
+      const userData = await res.json();
+      return userData;
+    } else if (res.status === 401) {
+      // Attempt to refresh token
+      await getNewToken();
+      // If token refresh is successful, try getting users again
+      const res2 = await fetch(API_ROOT + "/api/users", {
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': getToken()
+        }
+      });
+
+      if (res2.ok) {
+        const userData = await res2.json();
+        return userData;
+      } else {
+        throw new Error('Error, cannot get data even after token refresh!');
+      }
+    } else {
+      throw new Error('Error, cannot get data!');
     }
-  })
-        if (res.ok) {
-            const userData = res.json()
-            return userData     
-        }else if (res.status == 401) {
-          // 401 Unauthorized: รีเริ่มหน้า login
-          router.push({ name: 'login' });
-         }else throw new error('Error, cannot get data!')
-    } catch (error) {
-        console.log(error)
-    }
-}
+  } catch (error) {
+    return error
+  }
+};
+
 
 
 const sortedUserData = computed(() => {

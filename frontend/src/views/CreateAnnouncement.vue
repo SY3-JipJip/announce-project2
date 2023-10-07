@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted,computed } from 'vue';
 import { useRouter } from 'vue-router'
-
+import { getNewToken } from '../composable/getNewToken';
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const router = useRouter()
 
@@ -18,24 +18,33 @@ const getToken = () =>{
 }
 
 const getCategories = async () => {
-    try {
-        const res = await fetch(API_ROOT+"/api/categories",{
-            headers:{
-                "Content-Type": "application/json",
-                'Authorization': getToken()
-              }
-        })
-        
-        // if(res.status===201)        
-        if (res.ok) {
-            const categories = res.json()
-            return categories       
-        } 
-            else throw new error('Error, cannot get data!')
-    } catch (error) {
-        alert(error)
+  try {
+    const res = await fetch(API_ROOT + "/api/categories", {
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': getToken()
+      }
+    });
+
+    if (!res.ok) {
+      if (res.status === 401) {
+        // Token is invalid, attempt to refresh it
+        await getNewToken();
+
+        // Retry the `getCategories` function with the new token
+        return await getCategories();
+      } else {
+        throw new Error('Error, cannot get data!');
+      }
+    } else {
+      const categories = await res.json();
+      return categories;
     }
+  } catch (error) {
+    return error
+  }
 }
+
 //ถ้า USER ไม่กรอกข้อมูล title หรือ category หรือ description ก็จะไม่ยอมให้ กดปุ่ม submit 
 const submitBtn = computed(()=>{
    return title.value.trim().length === 0 || category.value === undefined  || description.value.trim().length === 0

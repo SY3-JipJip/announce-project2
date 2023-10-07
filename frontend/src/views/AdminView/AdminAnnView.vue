@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router'
 import { formatDate } from '../../composable/formatDate'
+import { getNewToken } from '../../composable/getNewToken';
 const announcementData = ref([])
 const router = useRouter()
 
@@ -28,16 +29,19 @@ const loadData = async () => {
       const data = await res.json();
       return data;
     } else if (res.status === 401) {
-      // 401 Unauthorized: รีเริ่มหน้า login
-      router.push({ name: 'login' });
+      // Token is invalid, attempt to refresh it
+      await getNewToken();
+
+      // Retry the `loadData` function with the new token
+      return await loadData();
     } else {
       throw new Error('Could not load data');
     }
-
   } catch (error) {
-    console.log(`ERROR: ${error}`);
+    return error
   }
 }
+
 
 
 const showDescription = (announcementId) =>{

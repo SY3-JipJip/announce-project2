@@ -2,11 +2,11 @@
 import {ref, onMounted } from 'vue';
 import { useRoute ,useRouter } from 'vue-router'
 import { formatDate } from '../../composable/formatDate'
+import { getNewToken } from '../../composable/getNewToken';
 const router = useRouter()
 const { params } = useRoute()
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const announcementDetail = ref([])
-const errorMSG = ref('')
 
 onMounted(async()=>{
     await loadDetail()
@@ -28,20 +28,26 @@ const loadDetail = async () => {
 
         if (!res.ok) {
             if (res.status === 401) {
-                // 401 Unauthorized: รีเริ่มหน้า login
-                router.push({ name: 'login' });
+                // Token is invalid, attempt to refresh it
+                await getNewToken();
+
+                // Retry the `loadDetail` function with the new token
+                return await loadDetail();
             } else {
-                alert('The requested page is not available');
-                router.push({ name: 'home' });
+                alert('The request page is not available');
+                router.push({
+                    name: 'home'
+                });
+                throw new Error(res.status);
             }
-            throw new Error(res.status);
         } else {
             announcementDetail.value = await res.json();
         }
-    } catch (err) {
-        errorMSG.value = err;
+    } catch (error) {
+        return error
     }
 }
+
 
 
 const editAnnouncement = (announcementId) =>{

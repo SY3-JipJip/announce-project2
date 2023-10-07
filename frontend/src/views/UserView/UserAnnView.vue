@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router'
 import { formatDate } from '../../composable/formatDate'
 import { userAnnouncement } from '../../Store/userMode'
-
+import { getNewToken } from '../../composable/getNewToken';
 
 const getToken = () =>{
   const token = localStorage.getItem("token")
@@ -42,7 +42,6 @@ const changeMode = async () =>{
   }else{
     await getClosedAnnouncements()
   }
-  console.log(isActive.value)
 }
 
 
@@ -59,13 +58,25 @@ const getActiveAnnouncements = async () => {
         if (res.ok) {
             announcementData.value = await res.json();
         } else if (res.status === 401) {
-            // 401 Unauthorized: เรียกใช้งานการเปลี่ยนเส้นทางไปยังหน้า login
-            router.push({ name: 'login' });
+            // Attempt to refresh token
+            await getNewToken();
+            // If token refresh is successful, retry the request
+            const res2 = await fetch(API_ROOT + '/api/announcements?mode=active', {
+                headers: {
+                    'Authorization': getToken()
+                }
+            });
+
+            if (res2.ok) {
+                announcementData.value = await res2.json();
+            } else {
+                throw new Error('Could not load data even after token refresh');
+            }
         } else {
             throw new Error('Could not load data');
         }
     } catch (error) {
-        alert(error);
+      return error
     }
 }
 
@@ -80,13 +91,25 @@ const getClosedAnnouncements = async () => {
         if (res.ok) {
             announcementData.value = await res.json();
         } else if (res.status === 401) {
-            // 401 Unauthorized: เรียกใช้งานการเปลี่ยนเส้นทางไปยังหน้า login
-            router.push({ name: 'login' });
+            // Attempt to refresh token
+            await getNewToken();
+            // If token refresh is successful, retry the request
+            const res2 = await fetch(API_ROOT + '/api/announcements?mode=close', {
+                headers: {
+                    'Authorization': getToken()
+                }
+            });
+
+            if (res2.ok) {
+                announcementData.value = await res2.json();
+            } else {
+                throw new Error('Could not load data even after token refresh');
+            }
         } else {
             throw new Error('Could not load data');
         }
     } catch (error) {
-        alert(error);
+      return error
     }
 }
 

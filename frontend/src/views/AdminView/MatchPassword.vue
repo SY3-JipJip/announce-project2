@@ -1,6 +1,6 @@
 <script setup>
 import {ref} from 'vue'
-
+import { getNewToken } from '../../composable/getNewToken';
 const username = ref('')
 const password = ref('')
 const alertText = ref('')
@@ -14,38 +14,46 @@ const getToken = () =>{
   return "Bearer " + token
 }
 
-const match = async(token)=>{
-    let userInfo = {
-        username : username.value.trim(),
-        password : password.value.trim()
+const match = async (token) => {
+  let userInfo = {
+    username: username.value.trim(),
+    password: password.value.trim()
+  };
+  try {
+    const res = await fetch(API_ROOT + '/api/users/match', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': getToken()
+      },
+      body: JSON.stringify(userInfo)
+    });
+
+    if (res.status === 200) {
+      statusCode.value = 200;
+      alertText.value = 'Password Matched';
+      className.value = 'alert-success';
+    } else if (res.status === 404) {
+      statusCode.value = 404;
+      alertText.value = 'The specified username DOES NOT exist';
+      className.value = 'alert-error';
+    } else if (res.status === 401) {
+      statusCode.value = 401;
+      alertText.value = 'Password NOT Matched';
+      className.value = 'alert-error';
+
+      // Token is invalid, attempt to refresh it
+      await getNewToken();
+
+      // Retry the `match` function with the new token
+      await match(getToken());
     }
-    try{
-        const res = await fetch(API_ROOT + '/api/users/match',{
-                method: "POST",      
-                headers: {
-                    "Content-Type": "application/json",
-                    'Authorization': getToken()
-                        },
-                body: JSON.stringify(userInfo)
-        })
-        if(res.status === 200){
-            statusCode.value = 200
-            alertText.value = 'Password Matched'
-            className.value = 'alert-success'
-        }else if(res.status === 404){
-          statusCode.value = 404
-          alertText.value = 'The specified username DOES NOT exist'
-          className.value = 'alert-error'
-        }else if(res.status === 401){
-          statusCode.value = 401
-          alertText.value = 'Password NOT Matched'
-          className.value = 'alert-error'
-        } 
-        warning.value = true   
-    } catch (error) {
-        alert(error)
-    }
-}
+    warning.value = true;
+  } catch (error) {
+    return error
+  }
+};
+
 
 </script>
  
