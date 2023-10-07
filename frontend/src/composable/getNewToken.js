@@ -1,5 +1,4 @@
-import { useRouter } from 'vue-router'
-
+const API_ROOT = import.meta.env.VITE_API_ROOT
 const getNewToken = async () => {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_ROOT}/api/token`, {
@@ -18,7 +17,7 @@ const getNewToken = async () => {
         console.log('Token refreshed successfully');
       } else {
         alert('Please Login');
-        window.location.href = '/login';
+        window.location.href = `${API_ROOT}/login`;
       }
     } catch (err) {
       console.error('An error occurred while refreshing the token', err);
