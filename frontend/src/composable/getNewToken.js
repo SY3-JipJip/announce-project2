@@ -1,3 +1,4 @@
+import router from '../router'
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const getNewToken = async () => {
     try {
@@ -16,8 +17,10 @@ const getNewToken = async () => {
   
         console.log('Token refreshed successfully');
       } else {
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
         alert('Please Login');
-        window.location.href = `${API_ROOT}/login`;
+        router.push("/login")
       }
     } catch (err) {
       console.error('An error occurred while refreshing the token', err);

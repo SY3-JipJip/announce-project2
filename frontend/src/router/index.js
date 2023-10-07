@@ -12,7 +12,6 @@ import AdminEditUser from '../views/AdminView/AdminEditUser.vue'
 import AdminDeleteUser from '../views/AdminView/AdminDeleteUser.vue' 
 import MatchPassword from '../views/AdminView/MatchPassword.vue'
 import LoginView from '../views/LoginView.vue'
-import { getNewToken } from '../composable/getNewToken'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
