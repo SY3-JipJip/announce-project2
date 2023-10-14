@@ -59,14 +59,18 @@ CREATE TABLE IF NOT EXISTS `mydb`.`announces` (
   `closeDate` DATETIME NULL DEFAULT NULL,
   `announcementDisplay` ENUM('Y', 'N') NOT NULL,
   `categoryId` INT NOT NULL,
+  `userId` INT NOT NULL,
   PRIMARY KEY (`announcementId`),
   INDEX `fk_announces_categories_idx` (`categoryId` ASC) VISIBLE,
+  INDEX `fk_announces_users1_idx` (`userId` ASC) VISIBLE,
   CONSTRAINT `fk_announces_categories`
     FOREIGN KEY (`categoryId`)
-    REFERENCES `mydb`.`categories` (`categoryId`)
+    REFERENCES `mydb`.`categories` (`categoryId`),
+  CONSTRAINT `fk_announces_users1`
+    FOREIGN KEY (`userId`)
+    REFERENCES `mydb`.`users` (`userId`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION
-)
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
