@@ -35,7 +35,10 @@ public class Announcement {
          @JoinColumn(name = "categoryId")
          private Category categories;
 
-
+        @JsonIgnore
+                @ManyToOne
+                @JoinColumn(name = "userId")
+                private User users;
 }
 
 
