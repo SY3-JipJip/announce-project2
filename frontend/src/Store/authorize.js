@@ -6,14 +6,11 @@ export const useAuthorize = defineStore('authorize', () => {
   const token = localStorage.getItem('token');
   const decodedToken = token ? jwt_decode(token) : null;
   
-  // ตรวจสอบว่า decodedToken ไม่ใช่ค่าว่างหรือ null ก่อนที่จะอ่านค่าบทบาท
-  const userRoleRef = ref(decodedToken ? decodedToken.role : '');
-
-  // หรือหากคุณต้องการให้ userRole มีการอัปเดตอัตโนมัติเมื่อ decodedToken มีการเปลี่ยนแปลง
+  // ต้องการให้ userRole มีการอัปเดตอัตโนมัติเมื่อ decodedToken มีการเปลี่ยนแปลง
   const decodedTokenRef = ref(decodedToken);
-  const userRoleComputed = computed(() => decodedTokenRef.value ? decodedTokenRef.value.role : '');
+  const userRole  = computed(() => decodedTokenRef.value ? decodedTokenRef.value.role : '');
 
-  return { userRole: userRoleRef, userRoleComputed };
+  return { userRole };
 });
 
 if (import.meta.hot) {
