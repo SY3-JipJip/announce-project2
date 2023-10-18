@@ -44,7 +44,7 @@ const loadDetail = async () => {
             announcementDetail.value = await res.json();
         }
     } catch (error) {
-        return error
+        console.log('error ',error)
     }
 }
 

@@ -53,7 +53,7 @@ const login = async () =>{
         }
         warning.value = true   
     } catch (error) {
-        alert(error)
+        console.log('error ',error)
         router.push('/login');
     }
 }
@@ -103,6 +103,9 @@ const login = async () =>{
           </div>
         </div>
 
+        <router-link :to="{name:'UserAnnView'}"><div class="mt-5 hover:text-blue-500 cursor-pointer">
+          Continue without logging in
+        </div></router-link>
         
       </div>
     </div>

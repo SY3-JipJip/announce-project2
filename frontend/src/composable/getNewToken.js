@@ -19,8 +19,8 @@ const getNewToken = async () => {
       } else {
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
-        alert('Please Login');
-        router.push("/login")
+        alert('Please login!')
+        router.push({name:'login'})
       }
     } catch (err) {
       console.error('An error occurred while refreshing the token', err);

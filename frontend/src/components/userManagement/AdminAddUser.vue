@@ -47,7 +47,7 @@ const getUsers = async () => {
       throw new Error('Error, cannot get data!');
     }
   } catch (error) {
-    return error
+    console.log('error', error)
   }
 };
 

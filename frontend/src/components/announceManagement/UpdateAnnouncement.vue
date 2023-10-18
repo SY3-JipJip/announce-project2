@@ -1,8 +1,8 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRoute ,useRouter } from 'vue-router'
-import { convertDate, convertTime } from '../composable/formatDate.js'
-import { getNewToken } from '../composable/getNewToken';
+import { convertDate, convertTime } from '../../composable/formatDate.js'
+import { getNewToken } from '../../composable/getNewToken.js';
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const { params } = useRoute()
 const router = useRouter()
@@ -88,11 +88,14 @@ const loadDetail = async () => {
 
     if (!res.ok) {
       if (res.status === 401) {
-        // Token is invalid, attempt to refresh it
-        await getNewToken();
+            //get new token in composable/getNewToken.js
+            await getNewToken();
+            // Retry the `getCategories` function with the new token
+            return await loadDetail();
 
-        // Retry the `loadDetail` function with the new token
-        return await loadDetail();
+        }else if(res.status === 403){
+            alert('Sorry, you do not have permission to access this page.')
+            router.push({name:'UserAnnView'})
       } else {
         alert('The requested page is not available');
         router.push({ name: 'home' });
@@ -103,7 +106,7 @@ const loadDetail = async () => {
       announcementDetail.value = data;
     }
   } catch (err) {
-    console.error(err);
+    console.error('error ',err);
   }
 }
 

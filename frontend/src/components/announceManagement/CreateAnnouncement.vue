@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted,computed } from 'vue';
 import { useRouter } from 'vue-router'
-import { getNewToken } from '../composable/getNewToken';
+import { getNewToken } from '../../composable/getNewToken';
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const router = useRouter()
 
@@ -27,21 +27,25 @@ const getCategories = async () => {
     });
 
     if (!res.ok) {
-      if (res.status === 401) {
-        // Token is invalid, attempt to refresh it
-        await getNewToken();
-
-        // Retry the `getCategories` function with the new token
-        return await getCategories();
-      } else {
+        if (res.status === 401) {
+            //get new token in composable/getNewToken.js
+            await getNewToken();
+            // Retry the `getCategories` function with the new token
+            return await getCategories();
+            
+        }else if(res.status === 403){
+            alert('Sorry, you do not have permission to access this page.')
+            router.push({name:'UserAnnView'})
+        }else {
         throw new Error('Error, cannot get data!');
       }
+
     } else {
       const categories = await res.json();
       return categories;
     }
   } catch (error) {
-    return error
+    console.log('error ',error)
   }
 }
 
@@ -142,7 +146,7 @@ const submit = async () => {
     <!-- Add Announcement Title -->
 
     <div class="flex flex-row items-center justify-center mt-2">
-        <div><img src="../assets/images/add.png" class="h-20"></div>
+        <div><img src="../../assets/images/add.png" class="h-20"></div>
         <div><h1 class="ml-10 mb-3 font-bold flex w-full text-3xl m-5">Add Announcement</h1></div>
     </div>
        

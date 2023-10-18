@@ -46,11 +46,12 @@ const match = async (token) => {
       await getNewToken();
 
       // Retry the `match` function with the new token
-      await match(getToken());
+      await match();
     }
     warning.value = true;
   } catch (error) {
-    return error
+    router.push('/login')
+    console.log('error ',error)
   }
 };
 

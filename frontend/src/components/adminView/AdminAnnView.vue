@@ -43,21 +43,33 @@ const loadData = async () => {
 }
 
 
+const deleteAnnouncement = async (announcementId) => {
+    const confirmed = window.confirm('Do you want to delete');
+    if (confirmed) {
+        try {
+            const res = await fetch(`${API_ROOT}/api/announcements/${announcementId}`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    'Authorization': getToken()
+                },
+                method: 'DELETE'
+            })
 
-const showDescription = (announcementId) =>{
-  router.push({
-    name : 'desc',
-    params : {id : announcementId}
-  })
+            if (res.ok) {
+              announcementData.value = announcementData.value.filter((andata) => andata.id !== announcementId); 
+            } else {
+                alert(`There are no announcement with id = ${announcementId}`);
+                throw new Error('Cannot delete data!');
+            }
+        } catch (error) {
+            console.log(`ERROR: ${error}`);
+        }
+    } else {
+        router.push({
+            name: 'home'
+        });
+    }
 }
-
-const deleteAnnouncement = async (announcementId) =>{
-  router.push({
-    name : 'deleteAnnounce',
-    params : {id : announcementId}
-  })
-}
-
 
 
 </script>

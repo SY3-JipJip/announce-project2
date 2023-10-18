@@ -8,43 +8,20 @@ const { params } = useRoute()
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const announcementDetail = ref([])
 
-const getToken = () =>{
-  const token = localStorage.getItem("token")
-  return "Bearer " + token
-}
-
 onMounted(async()=>{
     await loadDetail()
 })
 
 const loadDetail = async () => {
   try {
-    const res = await fetch(`${API_ROOT}/api/announcements/${params.id}`, {
-      headers: {
-        "Content-Type": "application/json",
-        'Authorization': getToken()
-      }
-    });
-
-    if (!res.ok) {
-      if (res.status === 401) {
-        // Token is invalid, attempt to refresh it
-        await getNewToken();
-
-        // Retry the `loadDetail` function with the new token
-        return await loadDetail();
-      } else {
-        alert('The requested page is not available');
-        router.push({
-          name: 'home'
-        });
-        throw new Error(res.status);
-      }
-    } else {
+    const res = await fetch(`${API_ROOT}/api/announcements/${params.id}`);
+    if(res.ok){
       announcementDetail.value = await res.json();
+    }else {
+      throw new Error('Could not load data');
     }
   } catch (error) {
-    return error
+    console.log('error ',error)
   }
 };
 

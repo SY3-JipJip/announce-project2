@@ -61,23 +61,23 @@ const getUserById = async (userId) => {
 
     if (!res.ok) {
       if (res.status === 401) {
-        // Token is invalid, attempt to refresh it
+        //get new token in composable/getNewToken.js
         await getNewToken();
-
-        // Retry the `getUserById` function with the new token
         return await getUserById(userId);
-      } else {
+
+    } else if(res.status === 403){
+        alert('Sorry, you do not have permission to access this page.')
+        router.push({name:'UserAnnView'})
+    } else {
         alert('The requested page is not available');
-        router.push({
-          name: 'AdminUserView'
-        });
+        router.push({name: 'AdminUserView'});
         throw new Error(res.status);
       }
     } else {
       return await res.json();
     }
   } catch (error) {
-    return error
+    console.log('error ',error)
   }
 };
 
