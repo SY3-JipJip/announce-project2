@@ -52,7 +52,7 @@ const getActiveAnnouncements = async () => {
             throw new Error('Could not load data');
         }
     } catch (error) {
-      console.log(error)
+      console.error('error ', error);
     }
 }
 

@@ -2,21 +2,20 @@
 import {ref,onMounted,computed} from 'vue'
 import { formatDate } from '../../composable/formatDate'
 import { useRouter } from 'vue-router'
-import { getNewToken } from '../../composable/getNewToken';
+
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const router = useRouter()
 
-
 const userData = ref([])
 
-const getToken = () =>{
-  const token = localStorage.getItem("token")
-  return "Bearer " + token
-}
-
-onMounted(async()=>{
-  userData.value = await getUsers()
+onMounted(async ()=>{
+  await getUsers()
 })
+
+const getAllToken = ()=>{
+  console.log('token',localStorage.getItem('token'))
+  console.log('refreshToken',localStorage.getItem('refreshToken'))
+}
 
 
 const getUsers = async () => {
@@ -25,27 +24,20 @@ const getUsers = async () => {
     const res = await fetch(API_ROOT + "/api/users", {
       headers: {
         "Content-Type": "application/json",
-        'Authorization': getToken()
+        'Authorization': "Bearer " + localStorage.getItem('token')
       }
     });
 
     if (res.ok) {
-      const userData = await res.json();
-      return userData;
+      userData.value = await res.json();
 
-    } else if (res.status === 401) {
-      // Attempt to refresh token
-      await getNewToken();
-      // If token refresh is successful, try getting users again
-      return await getUsers()
-
-    } else {
+    } 
+    else {
       throw new Error('Error, cannot get data!');
     }
 
   } catch (error) {
-    router.push('/login')
-    console.log('error ',error)
+    return error
   }
 };
 
@@ -68,7 +60,6 @@ const deleteUser = async (userId) =>{
         throw new Error('cannot delete data!')
       }
     } catch(error) {
-      router.push('/login')
       console.log('error ',error)
     }
   }else{
@@ -154,14 +145,14 @@ const editUser = (userId) =>{
             <td class="ann-created-on" :class="user.createdOn === null ? 'text-center' :'' " >{{ user.createdOn === null ? '-' : formatDate(user.createdOn) }}</td>
             <td class="ann-updated-on" :class="user.updatedOn === null ? 'text-center' :'' ">{{ user.updatedOn === null ? '-' : formatDate(user.updatedOn) }}</td>
             <td class="flex justify-center space-x-2">
-              <button @click="editUser(user.idn)"  class="ann-button border border-gray-600 p-1 pl-4 pr-4 border-y-6 bg-gray-500 rounded-md btn-sm btn">edit</button>
+              <button @click="editUser(user.id)"  class="ann-button border border-gray-600 p-1 pl-4 pr-4 border-y-6 bg-gray-500 rounded-md btn-sm btn">edit</button>
               <button @click="deleteUser(user.id)"  class="ann-button border border-red-600 p-1 pl-3 pr-3 border-y-6 bg-red-600 rounded-md btn-sm btn">delete</button>
             </td>
           </tr>
         </tbody>
   </table>
 
-
+  <button @click="getAllToken" class="btn btn-primary">click here</button>
 </div>
 
 

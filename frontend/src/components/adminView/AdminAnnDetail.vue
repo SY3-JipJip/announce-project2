@@ -2,7 +2,7 @@
 import {ref, onMounted } from 'vue';
 import { useRoute ,useRouter } from 'vue-router'
 import { formatDate } from '../../composable/formatDate'
-import { getNewToken } from '../../composable/getNewToken';
+
 const router = useRouter()
 const { params } = useRoute()
 const API_ROOT = import.meta.env.VITE_API_ROOT
@@ -12,39 +12,39 @@ onMounted(async()=>{
     await loadDetail()
 })
 
-const getToken = () =>{
-  const token = localStorage.getItem("token")
-  return "Bearer " + token
-}
 
 const loadDetail = async () => {
+
+    if (!localStorage.getItem('refreshToken')) {
+        router.push({name:'login'})
+    }
+
     try {
         const res = await fetch(`${API_ROOT}/api/announcements/${params.id}`, {
             headers: {
                 "Content-Type": "application/json",
-                'Authorization': getToken()
+                'Authorization': "Bearer " + localStorage.getItem('token')
             }
         });
 
         if (!res.ok) {
             if (res.status === 401) {
-                // Token is invalid, attempt to refresh it
-                await getNewToken();
-
-                // Retry the `loadDetail` function with the new token
-                return await loadDetail();
-            } else {
+                alert('Please login!')
+                router.push({ name: 'login' })
+    
+            }else {
                 alert('The request page is not available');
                 router.push({
                     name: 'home'
                 });
                 throw new Error(res.status);
             }
-        } else {
+
+        }else {
             announcementDetail.value = await res.json();
         }
     } catch (error) {
-        console.log('error ',error)
+        console.error('error ', error);
     }
 }
 
@@ -52,7 +52,7 @@ const loadDetail = async () => {
 
 const editAnnouncement = (announcementId) =>{
     router.push({
-        name : 'updateAnnounce',
+        name : 'UpdateAnnouncement',
         params : {id : announcementId}
     })
 }

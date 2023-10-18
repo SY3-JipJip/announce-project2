@@ -1,6 +1,10 @@
+
 import router from '../router'
 const API_ROOT = import.meta.env.VITE_API_ROOT
+const tokenExp = Number(import.meta.env.VITE_TOKEN_EXP)
+
 const getNewToken = async () => {
+
     try {
       const res = await fetch(`${API_ROOT}/api/token`, {
         headers: {
@@ -14,13 +18,20 @@ const getNewToken = async () => {
   
         // บันทึก token ใหม่ใน localStorage และใน composition ref
         localStorage.setItem('token', newToken);
-  
+        
+        setTimeout(() => {
+          localStorage.removeItem("token");
+        },tokenExp);
+
+
         console.log('Token refreshed successfully');
+
       } else {
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
-        alert('Please login!')
-        router.push({name:'login'})
+        
+        alert("Please Login")
+        router.push("/login")
       }
     } catch (err) {
       console.error('An error occurred while refreshing the token', err);
@@ -28,4 +39,6 @@ const getNewToken = async () => {
     }
   };
 
-  export {getNewToken}
+
+
+export { getNewToken }

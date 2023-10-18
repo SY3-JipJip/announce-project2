@@ -1,6 +1,6 @@
 <script setup>
 import {ref} from 'vue'
-import { getNewToken } from '../../composable/getNewToken';
+
 const username = ref('')
 const password = ref('')
 const alertText = ref('')
@@ -9,12 +9,9 @@ const warning = ref(false)
 const statusCode = ref(0)
 const API_ROOT = import.meta.env.VITE_API_ROOT
 
-const getToken = () =>{
-  const token = localStorage.getItem("token")
-  return "Bearer " + token
-}
 
-const match = async (token) => {
+const match = async () => {
+
   let userInfo = {
     username: username.value.trim(),
     password: password.value.trim()
@@ -24,7 +21,7 @@ const match = async (token) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': getToken()
+        'Authorization': "Bearer " + localStorage.getItem('token')
       },
       body: JSON.stringify(userInfo)
     });
@@ -41,17 +38,10 @@ const match = async (token) => {
       statusCode.value = 401;
       alertText.value = 'Password NOT Matched';
       className.value = 'alert-error';
-
-      // Token is invalid, attempt to refresh it
-      await getNewToken();
-
-      // Retry the `match` function with the new token
-      await match();
     }
     warning.value = true;
   } catch (error) {
-    router.push('/login')
-    console.log('error ',error)
+    console.error('error ', error);
   }
 };
 

@@ -2,7 +2,7 @@
 import {ref, onMounted } from 'vue';
 import { useRoute ,useRouter } from 'vue-router'
 import { formatDate } from '../../composable/formatDate'
-import { getNewToken } from '../../composable/getNewToken';
+
 const router = useRouter()
 const { params } = useRoute()
 const API_ROOT = import.meta.env.VITE_API_ROOT
@@ -13,13 +13,31 @@ onMounted(async()=>{
 })
 
 const loadDetail = async () => {
-  try {
-    const res = await fetch(`${API_ROOT}/api/announcements/${params.id}`);
-    if(res.ok){
-      announcementDetail.value = await res.json();
-    }else {
-      throw new Error('Could not load data');
+
+    if (!localStorage.getItem('refreshToken')) {
+        alert('Please login!')
+        router.push({name:'login'})
     }
+
+  try {
+    const res = await fetch(`${API_ROOT}/api/announcements/${params.id}`, {
+      headers: {
+        'Authorization': "Bearer " + localStorage.getItem('token')
+      }
+    });
+        if(res.ok){
+        announcementDetail.value = await res.json();
+
+        }else {
+
+            if(res.status===401){
+                alert('Please login!')
+                router.push({ name: 'login' })
+            }else{
+                throw new Error('Could not load data');
+            }   
+    }
+
   } catch (error) {
     console.log('error ',error)
   }

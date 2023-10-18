@@ -1,8 +1,12 @@
 <script setup >
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { storeToken } from '../composable/storeToken';
 
+const tokenExp = Number(import.meta.env.VITE_TOKEN_EXP)
+const refresTokenExp = Number(import.meta.env.VITE_REFRESHTOKEN_EXP)
+
+const token = ref(null)
+const refreshToken = ref(null)
 
 const FETCH_API = import.meta.env.VITE_API_ROOT
 const router = useRouter()
@@ -36,9 +40,24 @@ const login = async () =>{
           errText.value = 'Login Successfully'
           activeClass.value = true
           className.value = 'alert-success'
-          const token = await res.json()
-          storeToken(token)
-          router.push('/admin/announcement')
+
+          const tokens = await res.json()
+
+          token.value = tokens.token
+          refreshToken.value = tokens.refreshToken
+          
+          localStorage.setItem("token",token.value)
+          localStorage.setItem("refreshToken",refreshToken.value)
+
+        setTimeout(() => {
+          localStorage.removeItem("token");
+        },tokenExp);
+
+        setTimeout(() => {
+          localStorage.removeItem("refreshToken");
+        }, refresTokenExp);
+
+          router.push({name:'home'})
 
         }else if(res.status === 404){
           statusCode.value = 404

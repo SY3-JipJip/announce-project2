@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute ,useRouter } from 'vue-router'
 import { formatDate } from '../../composable/formatDate'
-import { getNewToken } from '../../composable/getNewToken';
+
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const { params } = useRoute()
 const router = useRouter()
@@ -28,7 +28,6 @@ const userDetail = ref([])
 
 onMounted(async () => {
     userDetail.value = await getUserById(params.id);
-    console.log(userDetail.value)
 
     oldData.value = {
             "username": userDetail.value.username,
@@ -43,41 +42,36 @@ onMounted(async () => {
 
 })
 
-const getToken = () =>{
-  const token = localStorage.getItem("token")
-  return "Bearer " + token
-}
-
-
-
 const getUserById = async (userId) => {
+
   try {
     const res = await fetch(`${API_ROOT}/api/users/${userId}`, {
       headers: {
         "Content-Type": "application/json",
-        'Authorization': getToken()
+        'Authorization': "Bearer " + localStorage.getItem('token')
       },
     });
 
     if (!res.ok) {
       if (res.status === 401) {
-        //get new token in composable/getNewToken.js
-        await getNewToken();
-        return await getUserById(userId);
+            alert('Please login!')
+            router.push({ name: 'login' })
 
-    } else if(res.status === 403){
-        alert('Sorry, you do not have permission to access this page.')
-        router.push({name:'UserAnnView'})
-    } else {
-        alert('The requested page is not available');
-        router.push({name: 'AdminUserView'});
-        throw new Error(res.status);
-      }
+        } else if(res.status === 403){
+            alert('Sorry, you do not have permission to access this page.')
+            router.push({name:'UserAnnView'})
+
+        } else {
+            alert('The requested page is not available');
+            router.push({name: 'AdminUserView'});
+            throw new Error(res.status);
+        }
+
     } else {
       return await res.json();
     }
   } catch (error) {
-    console.log('error ',error)
+    console.error('error ', error);
   }
 };
 
@@ -132,7 +126,7 @@ const submit = async () => {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
-                        'Authorization': getToken(),
+                        'Authorization': "Bearer " + localStorage.getItem('token'),
                     },
                     body: JSON.stringify(data)
                 });

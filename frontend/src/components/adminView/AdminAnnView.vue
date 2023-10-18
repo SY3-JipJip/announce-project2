@@ -2,43 +2,45 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router'
 import { formatDate } from '../../composable/formatDate'
-import { getNewToken } from '../../composable/getNewToken';
+
 const announcementData = ref([])
 const router = useRouter()
 
 const API_ROOT = import.meta.env.VITE_API_ROOT
 
 onMounted(async()=>{
-  announcementData.value = await loadData()
+    announcementData.value = await loadData()
 })
 
-const getToken = () =>{
-  const token = localStorage.getItem("token")
-  return "Bearer " + token
+
+const showDescription = (id) => {
+  router.push({name:'AdminAnnDetail',params:{id}})
 }
 
 const loadData = async () => {
+
+
   try {
     const res = await fetch(API_ROOT + "/api/announcements", {
       headers: {
-        'Authorization': getToken(),
+        'Authorization': "Bearer " + localStorage.getItem('token')
       }
     });
 
     if (res.ok) {
       const data = await res.json();
       return data;
-    } else if (res.status === 401) {
-      // Token is invalid, attempt to refresh it
-      await getNewToken();
 
-      // Retry the `loadData` function with the new token
-      return await loadData();
-    } else {
+    }else {
+      if(res.status===401){
+        alert('Please login!')
+        router.push({ name: 'login' })
+      }
       throw new Error('Could not load data');
     }
+
   } catch (error) {
-    return error
+    console.error('error ', error);
   }
 }
 

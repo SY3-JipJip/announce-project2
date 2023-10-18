@@ -2,15 +2,10 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute ,useRouter } from 'vue-router'
 import { convertDate, convertTime } from '../../composable/formatDate.js'
-import { getNewToken } from '../../composable/getNewToken.js';
+
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const { params } = useRoute()
 const router = useRouter()
-
-const getToken = () =>{
-  const token = localStorage.getItem("token")
-  return "Bearer " + token
-}
 
 let old = ref('')
 let pDate = ref('')
@@ -32,7 +27,7 @@ const displays = {
 let announcementDetail = ref({})
 onMounted(async ()=>{
     await loadDetail()
-    categories.value = await getCategories()
+    await getCategories()
     //เราต้องแปลงเวลา ที่เป็น format UTC ให้กลายเป็น format time กับ date แยกกัน
     if(announcementDetail.value.publishDate !== null){
         pDate.value = convertDate(announcementDetail.value.publishDate)
@@ -60,16 +55,14 @@ onMounted(async ()=>{
 
 const getCategories = async () => {
     try {
-        const res = await fetch(API_ROOT+"/api/categories",{
-            headers:{
-                'Authorization': getToken()
-              }
-        })
-        
+        const res = await fetch(API_ROOT+"/api/categories", {
+      headers: {
+        'Authorization': "Bearer " + localStorage.getItem('token')
+      }
+    });
         // if(res.status===201)        
         if (res.ok) {
-            const categories = res.json()
-            return categories       
+            categories.value = await res.json()   
         } 
             else throw new error('Error, cannot get data!')
     } catch (error) {
@@ -82,32 +75,30 @@ const loadDetail = async () => {
   try {
     const res = await fetch(`${API_ROOT}/api/announcements/AnnCatId/${params.id}`, {
       headers: {
-        'Authorization': getToken()
+        'Authorization': "Bearer " + localStorage.getItem('token')
       }
     });
 
-    if (!res.ok) {
-      if (res.status === 401) {
-            //get new token in composable/getNewToken.js
-            await getNewToken();
-            // Retry the `getCategories` function with the new token
-            return await loadDetail();
+        if (!res.ok) {
+            if (res.status === 401) {
+                alert('Please login!')
+                router.push({ name: 'login' })
 
-        }else if(res.status === 403){
-            alert('Sorry, you do not have permission to access this page.')
-            router.push({name:'UserAnnView'})
-      } else {
-        alert('The requested page is not available');
-        router.push({ name: 'home' });
-        throw new Error(res.status);
-      }
-    } else {
-      const data = await res.json();
-      announcementDetail.value = data;
+            }else if(res.status === 403){
+                alert('Sorry, you do not have permission to access this page.')
+                router.push({name:'UserAnnView'})
+
+            } else {
+                alert('The requested page is not available');
+                router.push({ name: 'home' });
+                throw new Error(res.status);
+            }
+        }else {
+            announcementDetail.value = await res.json();
+            }
+    } catch (error) {
+        console.error('error ', error);
     }
-  } catch (err) {
-    console.error('error ',err);
-  }
 }
 
 
@@ -189,7 +180,7 @@ const submit = async () =>{
         method : "PUT",
         headers: {
         "Content-Type": "application/json",
-        'Authorization' : getToken()
+        'Authorization' : "Bearer " + localStorage.getItem('token')
         },
         body: JSON.stringify({
         "announcementTitle": edittingAnnouncement.value.announcementTitle,
@@ -222,7 +213,7 @@ const submit = async () =>{
 
     <div class="flex m-5 flex-col mb-5 shadow-4xl border-blue-900 p-5 rounded-lg ">
     <div class="flex flex-row"> 
-        <img class="w-72" src="../assets/images/omen.gif" alt="GIF">
+        <img class="w-72" src="../../assets/images/omen.gif" alt="GIF">
         
         <h1 class="text-2xl text-center mt-20 mb-5 text-gray-800" style="text-shadow: 1px 2px 2px rgba(0, 0, 0, 0.3);">You can clear all your history data. <span class="text-blue-500" style="font-weight: bold;">Just click clear button!</span></h1>
         

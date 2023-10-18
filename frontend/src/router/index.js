@@ -17,6 +17,9 @@ import AdminEditUser from '../components/userManagement/AdminEditUser.vue'
 import MatchPassword from '../components/AdminView/MatchPassword.vue'
 import LoginView from '../components/LoginView.vue'
 
+
+import { getNewToken } from '../composable/getNewToken'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -27,17 +30,17 @@ const router = createRouter({
     },
     {
       path: '/admin/announcement/:id',
-      name: 'desc',
+      name: 'AdminAnnDetail',
       component: AdminAnnDetail
     },
     {
       path: '/admin/announcement/add',
-      name: 'addAnnounce',
+      name: 'CreateAnnouncement',
       component: CreateAnnouncement
     },
     {
       path: '/admin/announcement/:id/edit',
-      name: 'updateAnnounce',
+      name: 'UpdateAnnouncement',
       component: UpdateAnnouncement
     },
     {
@@ -80,7 +83,30 @@ const router = createRouter({
       component : LoginView
     }
   ]
+
 })
+
+
+router.beforeEach(async(to, from, next) => {
+  if(to.path === "/"){
+    next('/announcement')
+  }else if(localStorage.getItem("token") === null && localStorage.getItem("refreshToken") === null){
+    if(to.fullPath.includes("/admin/")){
+      alert("Please login");
+      next('/login')
+    }
+    
+    else next()
+  }else if(to.path !== '/login' && (localStorage.getItem("token") === null && localStorage.getItem("refreshToken") !== null)){
+    await getNewToken()
+    next()
+  }else{
+    next()
+  }
+
+})
+
+
 
 
 export default router

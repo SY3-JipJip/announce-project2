@@ -1,51 +1,45 @@
 <script setup>
 import { ref, onMounted,computed } from 'vue';
 import { useRouter } from 'vue-router'
-import { getNewToken } from '../../composable/getNewToken';
+
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const router = useRouter()
 
 //ALL CATEGORIES
 const categories = ref({})
 onMounted(async()=>{
-    categories.value = await getCategories()
+    await getCategories()
     
 })
 
-const getToken = () =>{
-  const token = localStorage.getItem("token")
-  return "Bearer " + token
-}
-
 const getCategories = async () => {
+    
   try {
     const res = await fetch(API_ROOT + "/api/categories", {
       headers: {
         "Content-Type": "application/json",
-        'Authorization': getToken()
+        'Authorization': "Bearer " + localStorage.getItem('token')
       }
     });
 
     if (!res.ok) {
         if (res.status === 401) {
-            //get new token in composable/getNewToken.js
-            await getNewToken();
-            // Retry the `getCategories` function with the new token
-            return await getCategories();
+            alert('Please login!')
+            router.push({ name: 'login' })
             
         }else if(res.status === 403){
             alert('Sorry, you do not have permission to access this page.')
             router.push({name:'UserAnnView'})
+
         }else {
-        throw new Error('Error, cannot get data!');
+            throw new Error('Error, cannot get data!');
       }
 
     } else {
-      const categories = await res.json();
-      return categories;
+        categories.value  = await res.json();
     }
   } catch (error) {
-    console.log('error ',error)
+    console.error('error ', error);
   }
 }
 
@@ -117,7 +111,7 @@ const submit = async () => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    'Authorization': getToken()
+                    'Authorization': "Bearer " + localStorage.getItem('token')
                 },
                 body: JSON.stringify(announcementObj.value)
             })

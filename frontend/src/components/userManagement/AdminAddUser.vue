@@ -1,8 +1,9 @@
 <script setup>
 import { ref, onMounted,computed } from 'vue';
 import { useRouter } from 'vue-router'
-import { getNewToken } from '../../composable/getNewToken';
+
 const oldUsers = ref([])
+
 onMounted(async()=>{
     oldUsers.value = await getUsers()
 })
@@ -10,44 +11,27 @@ onMounted(async()=>{
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const router = useRouter()
 
-const getToken = () =>{
-  const token = localStorage.getItem("token")
-  return "Bearer " + token
-}
-
 const getUsers = async () => {
+
   try {
     const res = await fetch(API_ROOT + "/api/users", {
       headers: {
-        'Authorization': getToken()
+        'Authorization': "Bearer " + localStorage.getItem('token')
       }
     });
 
     if (res.ok) {
       const userData = await res.json();
       return userData;
-    } else if (res.status === 401) {
-      // Token is invalid, attempt to refresh it
-      await getNewToken();
 
-      // Retry the API request with the new token
-      const res2 = await fetch(API_ROOT + "/api/users", {
-        headers: {
-          'Authorization': getToken()
-        }
-      });
-
-      if (res2.ok) {
-        const userData = await res2.json();
-        return userData;
-      } else {
-        throw new Error('Error, cannot get data even after token refresh!');
-      }
+    }else if (res.status === 401) {
+            alert('Please login!')
+            router.push({ name: 'login' })
     } else {
-      throw new Error('Error, cannot get data!');
+        throw new Error('Error, cannot get data!');
     }
   } catch (error) {
-    console.log('error', error)
+    console.error('error ', error);
   }
 };
 
