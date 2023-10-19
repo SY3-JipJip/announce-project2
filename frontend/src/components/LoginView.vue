@@ -2,9 +2,6 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-const tokenExp = Number(import.meta.env.VITE_TOKEN_EXP)
-const refresTokenExp = Number(import.meta.env.VITE_REFRESHTOKEN_EXP)
-
 const token = ref(null)
 const refreshToken = ref(null)
 
@@ -49,13 +46,9 @@ const login = async () =>{
           localStorage.setItem("token",token.value)
           localStorage.setItem("refreshToken",refreshToken.value)
 
-        setTimeout(() => {
-          localStorage.removeItem("token");
-        },tokenExp);
-
-        setTimeout(() => {
-          localStorage.removeItem("refreshToken");
-        }, refresTokenExp);
+          setTimeout(function() {
+              localStorage.removeItem("refreshToken");
+          }, 2 * 60 * 1000);
 
           router.push({name:'home'})
 

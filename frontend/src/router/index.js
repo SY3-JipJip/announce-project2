@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-
+import { getNewToken } from '../composable/getNewToken'
 import AdminAnnDetail from '../components/adminView/AdminAnnDetail.vue'
 import AdminAnnView from '../components/adminView/AdminAnnView.vue'
 import AdminUserView from '../components/adminView/AdminUserView.vue'
@@ -16,9 +16,6 @@ import AdminEditUser from '../components/userManagement/AdminEditUser.vue'
 
 import MatchPassword from '../components/AdminView/MatchPassword.vue'
 import LoginView from '../components/LoginView.vue'
-
-
-import { getNewToken } from '../composable/getNewToken'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -87,24 +84,31 @@ const router = createRouter({
 })
 
 
-router.beforeEach(async(to, from, next) => {
-  if(to.path === "/"){
-    next('/announcement')
-  }else if(localStorage.getItem("token") === null && localStorage.getItem("refreshToken") === null){
-    if(to.fullPath.includes("/admin/")){
-      alert("Please login");
-      next('/login')
-    }
-    
-    else next()
-  }else if(to.path !== '/login' && (localStorage.getItem("token") === null && localStorage.getItem("refreshToken") !== null)){
-    await getNewToken()
-    next()
-  }else{
-    next()
-  }
+router.beforeEach(async (to, from, next) => {
+  if (to.path === "/") {
+    next('/announcement');
 
-})
+  }else if (localStorage.getItem("token") === null && localStorage.getItem("refreshToken") === null) {
+    if (to.fullPath.includes("/admin/")) {
+      alert("Please login");
+      next('/login');
+    } else {
+      next();
+    }
+
+  }else if(localStorage.getItem("token") === null){
+    console.log(localStorage.getItem("token"))
+    console.log(localStorage.getItem("refreshToken"))
+    console.log('get new token here')
+    await getNewToken()
+
+  }
+  
+  else {
+      next();
+  }
+});
+
 
 
 

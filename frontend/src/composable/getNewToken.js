@@ -1,7 +1,6 @@
-
 import router from '../router'
+import { clearToken } from './clearToken.js'
 const API_ROOT = import.meta.env.VITE_API_ROOT
-const tokenExp = Number(import.meta.env.VITE_TOKEN_EXP)
 
 const getNewToken = async () => {
 
@@ -15,23 +14,13 @@ const getNewToken = async () => {
       if (res.ok) {
         const data = await res.json();
         const newToken = data.token;
-  
         // บันทึก token ใหม่ใน localStorage และใน composition ref
         localStorage.setItem('token', newToken);
-        
-        setTimeout(() => {
-          localStorage.removeItem("token");
-        },tokenExp);
-
-
         console.log('Token refreshed successfully');
-
-      } else {
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
-        
-        alert("Please Login")
-        router.push("/login")
+      }else{
+        clearToken()
+        alert('กรุณาเข้าสู่ระบบ')
+        router.push({name:'login'})
       }
     } catch (err) {
       console.error('An error occurred while refreshing the token', err);

@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute ,useRouter } from 'vue-router'
 import { formatDate } from '../../composable/formatDate'
+import { getNewToken } from '../../composable/getNewToken';
 
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const { params } = useRoute()
@@ -27,7 +28,8 @@ const userDetail = ref([])
 
 
 onMounted(async () => {
-    userDetail.value = await getUserById(params.id);
+
+        await getUserById(params.id);
 
     oldData.value = {
             "username": userDetail.value.username,
@@ -54,8 +56,25 @@ const getUserById = async (userId) => {
 
     if (!res.ok) {
       if (res.status === 401) {
-            alert('Please login!')
-            router.push({ name: 'login' })
+        try {
+          await getNewToken();
+          const newRes = await fetch(`${API_ROOT}/api/users/${userId}`, {
+            headers: {
+                "Content-Type": "application/json",
+                'Authorization': "Bearer " + localStorage.getItem('token')
+            },
+    });
+
+          if (newRes.ok) {
+            userDetail.value = await newRes.json();
+          } else {
+            clearToken();
+            router.push({ name: 'login' });
+          }
+        } catch (error) {
+          console.error('Failed to get new token:', error);
+          router.push({ name: 'login' });
+        }
 
         } else if(res.status === 403){
             alert('Sorry, you do not have permission to access this page.')
@@ -68,7 +87,7 @@ const getUserById = async (userId) => {
         }
 
     } else {
-      return await res.json();
+        userDetail.value = await res.json();
     }
   } catch (error) {
     console.error('error ', error);

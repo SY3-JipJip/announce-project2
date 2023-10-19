@@ -8,8 +8,9 @@ export const useAuthorize = defineStore('authorize', () => {
   
   // ต้องการให้ userRole มีการอัปเดตอัตโนมัติเมื่อ decodedToken มีการเปลี่ยนแปลง
   const decodedTokenRef = ref(decodedToken);
-  const userRole  = computed(() => decodedTokenRef.value ? decodedTokenRef.value.role : '');
+  // const userRole  = computed(() => decodedTokenRef.value ? decodedTokenRef.value.role : '');
 
+  const userRole = ref('admin')
   return { userRole };
 });
 

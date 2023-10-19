@@ -2,14 +2,19 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router'
 import { formatDate } from '../../composable/formatDate'
+import {useAuthorize} from '../../Store/authorize.js'
+import { storeToRefs } from 'pinia';
+import { getNewToken } from '../../composable/getNewToken';
+const myRole = useAuthorize()
 
+const {userRole} = storeToRefs(myRole)
 const announcementData = ref([])
 const router = useRouter()
 
 const API_ROOT = import.meta.env.VITE_API_ROOT
 
 onMounted(async()=>{
-    announcementData.value = await loadData()
+        await loadData()
 })
 
 
@@ -18,8 +23,7 @@ const showDescription = (id) => {
 }
 
 const loadData = async () => {
-
-
+  
   try {
     const res = await fetch(API_ROOT + "/api/announcements", {
       headers: {
@@ -28,15 +32,29 @@ const loadData = async () => {
     });
 
     if (res.ok) {
-      const data = await res.json();
-      return data;
+      announcementData.value = await res.json();
 
     }else {
-      if(res.status===401){
-        alert('Please login!')
-        router.push({ name: 'login' })
+      if (res.status === 401) {
+        try {
+          await getNewToken();
+          const newRes = await fetch(API_ROOT + "/api/announcements", {
+            headers: {
+              'Authorization': "Bearer " + localStorage.getItem('token')
+            }
+          });
+
+          if (newRes.ok) {
+            announcementData.value = await newRes.json();
+          }
+
+        } catch (error) {
+          console.error('Failed to get new token:', error);
+          router.push({ name: 'login' });
+        }
+      } else {
+        throw new Error('Error, cannot get data!');
       }
-      throw new Error('Could not load data');
     }
 
   } catch (error) {
@@ -104,6 +122,7 @@ const deleteAnnouncement = async (announcementId) => {
             <th>Publish Date</th>
             <th>Close Date</th>
             <th>Display</th>
+            <th v-if="userRole==='admin'">Owner</th>
             <th class="text-center">Action</th>
           </tr>
         </thead>
@@ -115,9 +134,10 @@ const deleteAnnouncement = async (announcementId) => {
             <td class="ann-publish-date" :class="announcement.publishDate === null ? 'text-center' : ''">{{ announcement.publishDate === null ? '-' : formatDate(announcement.publishDate) }}</td>
             <td class="ann-close-date" :class="announcement.closeDate === null ? 'text-center' : ''">{{ announcement.closeDate === null ? '-' : formatDate(announcement.closeDate) }}</td>
             <td class="ann-display">{{ announcement.announcementDisplay }}</td>
+            <td v-if="userRole==='admin'" class="ann-owner">{{ announcement.announcementOwner }}</td>
             <td class="flex justify-center space-x-2">
-              <button @click="showDescription(announcement.id)"  class="ann-button border border-gray-600 p-1 pl-4 pr-4 border-y-6 bg-gray-500 rounded-md btn-sm btn">view</button>
-              <button @click="deleteAnnouncement(announcement.id)"  class="ann-button border border-red-600 p-1 pl-3 pr-3 border-y-6 bg-red-600 rounded-md btn-sm btn">delete</button>
+              <button @click="showDescription(announcement.id)"  class="ann-button border border-gray-600 p-1 pl-1 pr-1 border-y-6 bg-gray-500 rounded-md btn-sm btn">view</button>
+              <button @click="deleteAnnouncement(announcement.id)"  class="ann-button border border-red-600 p-1 pl-1 pr-1 border-y-6 bg-red-600 rounded-md btn-sm btn">delete</button>
             </td>
           </tr>
         </tbody>
@@ -126,13 +146,13 @@ const deleteAnnouncement = async (announcementId) => {
       <h3 v-if="announcementData.length === 0" class="mt-3 flex justify-center items-center text-red-600 font-bold text-xl" >No Announcement</h3>
       
       <div class="flex flex-row">
-        <div class="w-full flex justify-start mt-10 ">  
+        <!-- <div class="w-full flex justify-start mt-10 ">  
               <img class="w-52" src="../../assets/images/mafu.png"/>
         </div>
 
         <div class="w-full h-auto mt-20 flex justify-end mb-0">
             <img class="flex ml-72" src="../../assets/images/pow2.gif"/>
-        </div>
+        </div> -->
 
       </div>
   </div>

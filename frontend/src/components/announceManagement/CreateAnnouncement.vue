@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted,computed } from 'vue';
 import { useRouter } from 'vue-router'
+import { getNewToken } from '../../composable/getNewToken';
 
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const router = useRouter()
@@ -8,12 +9,10 @@ const router = useRouter()
 //ALL CATEGORIES
 const categories = ref({})
 onMounted(async()=>{
-    await getCategories()
-    
+       await getCategories()
 })
 
 const getCategories = async () => {
-    
   try {
     const res = await fetch(API_ROOT + "/api/categories", {
       headers: {
@@ -23,25 +22,37 @@ const getCategories = async () => {
     });
 
     if (!res.ok) {
-        if (res.status === 401) {
-            alert('Please login!')
-            router.push({ name: 'login' })
-            
-        }else if(res.status === 403){
-            alert('Sorry, you do not have permission to access this page.')
-            router.push({name:'UserAnnView'})
+      if (res.status === 401) {
+        try {
+          await getNewToken();
+          const newRes = await fetch(API_ROOT + "/api/categories", {
+            headers: {
+              "Content-Type": "application/json",
+              'Authorization': "Bearer " + localStorage.getItem('token')
+            }
+          });
 
-        }else {
-            throw new Error('Error, cannot get data!');
+          if (newRes.ok) {
+              categories.value = await newRes.json();
+          } 
+        } catch (error) {
+          console.error('Failed to get new token:', error);
+          router.push({ name: 'login' });
+        }
+      } else if (res.status === 403) {
+        alert('Sorry, you do not have permission to access this page.');
+        router.push({ name: 'UserAnnView' });
+      } else {
+        throw new Error('Error, cannot get data!');
       }
-
     } else {
-        categories.value  = await res.json();
+      categories.value = await res.json();
     }
   } catch (error) {
     console.error('error ', error);
   }
-}
+};
+
 
 //ถ้า USER ไม่กรอกข้อมูล title หรือ category หรือ description ก็จะไม่ยอมให้ กดปุ่ม submit 
 const submitBtn = computed(()=>{
@@ -120,8 +131,7 @@ const submit = async () => {
                 const response = await res.json()
                 router.push('/admin/announcement')
             } else if (res.status === 401) {
-                // 401 Unauthorized: เรียกใช้งานการเปลี่ยนเส้นทางไปยังหน้า login
-                router.push({ name: 'login' });
+                await getCategories()
             } else {
                 alert('Could not create this announcement, please try again.');
             }

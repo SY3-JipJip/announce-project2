@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute ,useRouter } from 'vue-router'
 import { convertDate, convertTime } from '../../composable/formatDate.js'
+import { getNewToken } from '../../composable/getNewToken';
 
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const { params } = useRoute()
@@ -28,6 +29,7 @@ let announcementDetail = ref({})
 onMounted(async ()=>{
     await loadDetail()
     await getCategories()
+   
     //เราต้องแปลงเวลา ที่เป็น format UTC ให้กลายเป็น format time กับ date แยกกัน
     if(announcementDetail.value.publishDate !== null){
         pDate.value = convertDate(announcementDetail.value.publishDate)
@@ -70,7 +72,6 @@ const getCategories = async () => {
     }
 }
 
-//Get Announcement By ID
 const loadDetail = async () => {
   try {
     const res = await fetch(`${API_ROOT}/api/announcements/AnnCatId/${params.id}`, {
@@ -79,27 +80,41 @@ const loadDetail = async () => {
       }
     });
 
-        if (!res.ok) {
-            if (res.status === 401) {
-                alert('Please login!')
-                router.push({ name: 'login' })
+    if (!res.ok) {
+      if (res.status === 401) {
+        try {
+            await getNewToken();
+            const newRes = await fetch(`${API_ROOT}/api/announcements/AnnCatId/${params.id}`, {
+                headers: {
+                'Authorization': "Bearer " + localStorage.getItem('token')
+                }
+            });
 
-            }else if(res.status === 403){
-                alert('Sorry, you do not have permission to access this page.')
-                router.push({name:'UserAnnView'})
+            if (newRes.ok) {
+                announcementDetail.value = await newRes.json();
+            } 
 
-            } else {
-                alert('The requested page is not available');
-                router.push({ name: 'home' });
-                throw new Error(res.status);
-            }
-        }else {
-            announcementDetail.value = await res.json();
-            }
-    } catch (error) {
-        console.error('error ', error);
+        } catch (error) {
+          console.error('Failed to get new token:', error);
+          router.push({ name: 'login' });
+        }
+
+      } else if (res.status === 403) {
+        alert('Sorry, you do not have permission to access this page.');
+        router.push({ name: 'UserAnnView' });
+      } else {
+        alert('The requested page is not available');
+        router.push({ name: 'home' });
+        throw new Error(res.status);
+      }
+    } else {
+      announcementDetail.value = await res.json();
     }
-}
+  } catch (error) {
+    console.error('error ', error);
+  }
+};
+
 
 
 

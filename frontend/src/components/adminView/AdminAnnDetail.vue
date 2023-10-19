@@ -2,6 +2,7 @@
 import {ref, onMounted } from 'vue';
 import { useRoute ,useRouter } from 'vue-router'
 import { formatDate } from '../../composable/formatDate'
+import { getNewToken } from '../../composable/getNewToken';
 
 const router = useRouter()
 const { params } = useRoute()
@@ -9,16 +10,11 @@ const API_ROOT = import.meta.env.VITE_API_ROOT
 const announcementDetail = ref([])
 
 onMounted(async()=>{
-    await loadDetail()
+        await loadDetail()
 })
 
 
 const loadDetail = async () => {
-
-    if (!localStorage.getItem('refreshToken')) {
-        router.push({name:'login'})
-    }
-
     try {
         const res = await fetch(`${API_ROOT}/api/announcements/${params.id}`, {
             headers: {
@@ -29,25 +25,36 @@ const loadDetail = async () => {
 
         if (!res.ok) {
             if (res.status === 401) {
-                alert('Please login!')
-                router.push({ name: 'login' })
-    
-            }else {
-                alert('The request page is not available');
+                try {
+                    await getNewToken();
+                    const newRes = await fetch(`${API_ROOT}/api/announcements/${params.id}`, {
+                        headers: {
+                            "Content-Type": "application/json",
+                            'Authorization': "Bearer " + localStorage.getItem('token')
+                        }
+                    });
+
+                    if (newRes.ok) {
+                        announcementDetail.value = await newRes.json();
+                    }
+                } catch (error) {
+                    console.error('Failed to get new token:', error);
+                    router.push({ name: 'login' });
+                }
+            } else {
+                alert('The requested page is not available');
                 router.push({
                     name: 'home'
                 });
                 throw new Error(res.status);
             }
-
-        }else {
+        } else {
             announcementDetail.value = await res.json();
         }
     } catch (error) {
         console.error('error ', error);
     }
-}
-
+};
 
 
 const editAnnouncement = (announcementId) =>{

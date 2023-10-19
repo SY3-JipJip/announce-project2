@@ -1,11 +1,12 @@
 <script setup>
 import { ref, onMounted,computed } from 'vue';
 import { useRouter } from 'vue-router'
+import { getNewToken } from '../../composable/getNewToken';
 
 const oldUsers = ref([])
 
 onMounted(async()=>{
-    oldUsers.value = await getUsers()
+        await getUsers()
 })
 
 const API_ROOT = import.meta.env.VITE_API_ROOT
@@ -21,15 +22,32 @@ const getUsers = async () => {
     });
 
     if (res.ok) {
-      const userData = await res.json();
-      return userData;
+        oldUsers.value = await res.json();
 
-    }else if (res.status === 401) {
-            alert('Please login!')
-            router.push({ name: 'login' })
-    } else {
+    }else 
+        if (res.status === 401) {
+        try {
+          await getNewToken();
+          const newRes = await fetch(API_ROOT + "/api/users", {
+            headers: {
+              "Content-Type": "application/json",
+              'Authorization': "Bearer " + localStorage.getItem('token')
+            }
+          });
+
+          if (newRes.ok) {
+            oldUsers.value = await newRes.json();
+          } else {
+            clearToken();
+            router.push({ name: 'login' });
+          }
+        } catch (error) {
+          console.error('Failed to get new token:', error);
+          router.push({ name: 'login' });
+        }
+      } else {
         throw new Error('Error, cannot get data!');
-    }
+        }
   } catch (error) {
     console.error('error ', error);
   }
@@ -203,7 +221,7 @@ const submit = async () => {
             method: 'POST',
             headers : {
             "Content-Type": "application/json",
-            'Authorization': getToken()
+            'Authorization': "Bearer " + localStorage.getItem('token')
         },
             body: JSON.stringify(newUser)
         });

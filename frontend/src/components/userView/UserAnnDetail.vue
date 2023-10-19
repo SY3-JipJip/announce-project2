@@ -2,6 +2,7 @@
 import {ref, onMounted } from 'vue';
 import { useRoute ,useRouter } from 'vue-router'
 import { formatDate } from '../../composable/formatDate'
+import { getNewToken } from '../../composable/getNewToken';
 
 const router = useRouter()
 const { params } = useRoute()
@@ -9,7 +10,7 @@ const API_ROOT = import.meta.env.VITE_API_ROOT
 const announcementDetail = ref([])
 
 onMounted(async()=>{
-    await loadDetail()
+        await loadDetail()
 })
 
 const loadDetail = async () => {
@@ -31,8 +32,8 @@ const loadDetail = async () => {
         }else {
 
             if(res.status===401){
-                alert('Please login!')
-                router.push({ name: 'login' })
+                await getNewToken()
+                return await loadDetail()
             }else{
                 throw new Error('Could not load data');
             }   

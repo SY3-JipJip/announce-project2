@@ -17,6 +17,7 @@ const announcementData = ref({})
 
 
 onMounted(async ()=>{
+  
   //get ค่า active มาว่าเป็น จริงหรือเท็จ
   isActive.value = userAnn.getMode()
   // console.log(isActive.value)

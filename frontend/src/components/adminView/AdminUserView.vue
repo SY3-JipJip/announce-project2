@@ -2,6 +2,8 @@
 import {ref,onMounted,computed} from 'vue'
 import { formatDate } from '../../composable/formatDate'
 import { useRouter } from 'vue-router'
+import {getNewToken} from '../../composable/getNewToken'
+
 
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const router = useRouter()
@@ -9,17 +11,18 @@ const router = useRouter()
 const userData = ref([])
 
 onMounted(async ()=>{
-  await getUsers()
+      await getUsers()
+  
 })
 
-const getAllToken = ()=>{
-  console.log('token',localStorage.getItem('token'))
-  console.log('refreshToken',localStorage.getItem('refreshToken'))
-}
+// const getAllToken = ()=>{
+//   console.log('token',localStorage.getItem('token'))
+//   console.log('refreshToken',localStorage.getItem('refreshToken'))
+//   console.log(userRole.value)
+// }
 
 
 const getUsers = async () => {
-
   try {
     const res = await fetch(API_ROOT + "/api/users", {
       headers: {
@@ -30,16 +33,33 @@ const getUsers = async () => {
 
     if (res.ok) {
       userData.value = await res.json();
+    } else {
+      if (res.status === 401) {
+        try {
+          await getNewToken();
+          const newRes = await fetch(API_ROOT + "/api/users", {
+            headers: {
+              "Content-Type": "application/json",
+              'Authorization': "Bearer " + localStorage.getItem('token')
+            }
+          });
 
-    } 
-    else {
-      throw new Error('Error, cannot get data!');
+          if (newRes.ok) {
+            userData.value = await newRes.json();
+          } 
+        } catch (error) {
+          console.error('Failed to get new token:', error);
+          router.push({ name: 'login' });
+        }
+      } else {
+        throw new Error('Error, cannot get data!');
+      }
     }
-
   } catch (error) {
-    return error
+    return error;
   }
 };
+
 
 
 const deleteUser = async (userId) =>{
@@ -152,7 +172,7 @@ const editUser = (userId) =>{
         </tbody>
   </table>
 
-  <button @click="getAllToken" class="btn btn-primary">click here</button>
+  <!-- <button @click="getAllToken" class="btn btn-primary">click here</button> -->
 </div>
 
 
