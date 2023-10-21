@@ -3,7 +3,11 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router'
 import { formatDate } from '../../composable/formatDate'
 import { userAnnouncement } from '../../Store/userMode'
+import { useAuthorize } from '../../Store/authorize';
+import { storeToRefs } from 'pinia';
 
+const role = useAuthorize()
+const {userRole} = storeToRefs(role)
 
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const router = useRouter()
@@ -17,7 +21,8 @@ const announcementData = ref({})
 
 
 onMounted(async ()=>{
-  
+  console.log(userRole.value)
+
   //get ค่า active มาว่าเป็น จริงหรือเท็จ
   isActive.value = userAnn.getMode()
   // console.log(isActive.value)

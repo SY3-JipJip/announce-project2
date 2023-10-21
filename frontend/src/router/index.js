@@ -1,9 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { getNewToken } from '../composable/getNewToken'
+
 import AdminAnnDetail from '../components/adminView/AdminAnnDetail.vue'
 import AdminAnnView from '../components/adminView/AdminAnnView.vue'
 import AdminUserView from '../components/adminView/AdminUserView.vue'
-
 
 import CreateAnnouncement from '../components/announceManagement/CreateAnnouncement.vue'
 import UpdateAnnouncement from '../components/announceManagement/UpdateAnnouncement.vue'
@@ -16,6 +15,8 @@ import AdminEditUser from '../components/userManagement/AdminEditUser.vue'
 
 import MatchPassword from '../components/AdminView/MatchPassword.vue'
 import LoginView from '../components/LoginView.vue'
+
+import jwt_decode from 'jwt-decode';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -87,27 +88,24 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   if (to.path === "/") {
     next('/announcement');
-
-  }else if (localStorage.getItem("token") === null && localStorage.getItem("refreshToken") === null) {
+  } else if (localStorage.getItem("token") === null && localStorage.getItem("refreshToken") === null) {
     if (to.fullPath.includes("/admin/")) {
       alert("Please login");
       next('/login');
     } else {
       next();
     }
-
-  }else if(localStorage.getItem("token") === null){
-    console.log(localStorage.getItem("token"))
-    console.log(localStorage.getItem("refreshToken"))
-    console.log('get new token here')
-    await getNewToken()
-
-  }
-  
-  else {
+  } else {
+    const userRole = localStorage.getItem("userRole")
+    if (to.fullPath.includes("/user/") && userRole !== 'admin') {
+      alert("Access denied");
+      next('/announcement'); // หรือสามารถเปลี่ยนเส้นทางไปยังหน้าที่เหมาะสมได้
+    } else {
       next();
+    }
   }
 });
+
 
 
 

@@ -1,7 +1,10 @@
 <script setup >
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-
+import {useAuthorize} from '../Store/authorize'
+import {clearToken} from '../composable/clearToken'
+const useAuthor = useAuthorize()
+const {setRole} = useAuthor
 const token = ref(null)
 const refreshToken = ref(null)
 
@@ -15,6 +18,11 @@ const activeClass = ref(false)
 const className = ref('')
 const warning = ref(false)
 
+
+const notLogin = ()=>{
+  setRole(null)
+  router.push({name:'UserAnnView'})
+}
 
 const login = async () =>{
   let user = {
@@ -46,11 +54,9 @@ const login = async () =>{
           localStorage.setItem("token",token.value)
           localStorage.setItem("refreshToken",refreshToken.value)
 
-          setTimeout(function() {
-              localStorage.removeItem("refreshToken");
-          }, 2 * 60 * 1000);
+          setRole(token.value)
 
-          router.push({name:'home'})
+          router.push({name:'UserAnnView'})
 
         }else if(res.status === 404){
           statusCode.value = 404
@@ -115,9 +121,9 @@ const login = async () =>{
           </div>
         </div>
 
-        <router-link :to="{name:'UserAnnView'}"><div class="mt-5 hover:text-blue-500 cursor-pointer">
+        <div @click="notLogin" class="mt-5 hover:text-blue-500 cursor-pointer">
           Continue without logging in
-        </div></router-link>
+        </div>
         
       </div>
     </div>

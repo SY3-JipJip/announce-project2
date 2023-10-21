@@ -4,6 +4,10 @@ import { formatDate } from '../../composable/formatDate'
 import { useRouter } from 'vue-router'
 import {getNewToken} from '../../composable/getNewToken'
 
+import { useAuthorize } from '../../Store/authorize';
+import { storeToRefs } from 'pinia';
+const myRole = useAuthorize()
+const {userRole} = storeToRefs(myRole)
 
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const router = useRouter()
@@ -11,6 +15,10 @@ const router = useRouter()
 const userData = ref([])
 
 onMounted(async ()=>{
+  if(userRole.value !== 'admin'){
+    alert('Access Deny')
+    router.back()
+  }
       await getUsers()
   
 })
@@ -69,7 +77,7 @@ const deleteUser = async (userId) =>{
       const res = await fetch(`${API_ROOT}/api/users/${userId}`,{
       headers:{
         "Content-Type": "application/json",
-        'Authorization': getToken()
+        'Authorization': localStorage.getItem('token')
       },
         method:'DELETE'
       })

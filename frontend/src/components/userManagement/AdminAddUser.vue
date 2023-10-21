@@ -2,10 +2,17 @@
 import { ref, onMounted,computed } from 'vue';
 import { useRouter } from 'vue-router'
 import { getNewToken } from '../../composable/getNewToken';
-
+import { useAuthorize } from '../../Store/authorize';
+import { storeToRefs } from 'pinia';
+const myRole = useAuthorize()
+const {userRole} = storeToRefs(myRole)
 const oldUsers = ref([])
 
 onMounted(async()=>{
+    if(userRole.value !== 'admin'){
+    alert('Access Deny')
+    router.back()
+  }
         await getUsers()
 })
 
