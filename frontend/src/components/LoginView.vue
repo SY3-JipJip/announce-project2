@@ -1,8 +1,12 @@
 <script setup >
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { storeToken } from '../composable/storeToken';
-
+import {useAuthorize} from '../Store/authorize'
+import {clearToken} from '../composable/clearToken'
+const useAuthor = useAuthorize()
+const {setRole} = useAuthor
+const token = ref(null)
+const refreshToken = ref(null)
 
 const FETCH_API = import.meta.env.VITE_API_ROOT
 const router = useRouter()
@@ -14,6 +18,11 @@ const activeClass = ref(false)
 const className = ref('')
 const warning = ref(false)
 
+
+const notLogin = ()=>{
+  setRole(null)
+  router.push({name:'UserAnnView'})
+}
 
 const login = async () =>{
   let user = {
@@ -36,9 +45,18 @@ const login = async () =>{
           errText.value = 'Login Successfully'
           activeClass.value = true
           className.value = 'alert-success'
-          const token = await res.json()
-          storeToken(token)
-          router.push('/admin/announcement')
+
+          const tokens = await res.json()
+
+          token.value = tokens.token
+          refreshToken.value = tokens.refreshToken
+          
+          localStorage.setItem("token",token.value)
+          localStorage.setItem("refreshToken",refreshToken.value)
+
+          setRole(token.value)
+
+          router.push({name:'UserAnnView'})
 
         }else if(res.status === 404){
           statusCode.value = 404
@@ -53,7 +71,7 @@ const login = async () =>{
         }
         warning.value = true   
     } catch (error) {
-        alert(error)
+        console.log('error ',error)
         router.push('/login');
     }
 }
@@ -103,6 +121,9 @@ const login = async () =>{
           </div>
         </div>
 
+        <div @click="notLogin" class="mt-5 hover:text-blue-500 cursor-pointer">
+          Continue without logging in
+        </div>
         
       </div>
     </div>

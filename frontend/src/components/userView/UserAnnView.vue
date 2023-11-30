@@ -3,12 +3,11 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router'
 import { formatDate } from '../../composable/formatDate'
 import { userAnnouncement } from '../../Store/userMode'
-import { getNewToken } from '../../composable/getNewToken';
+import { useAuthorize } from '../../Store/authorize';
+import { storeToRefs } from 'pinia';
 
-const getToken = () =>{
-  const token = localStorage.getItem("token")
-  return "Bearer " + token
-}
+const role = useAuthorize()
+const {userRole} = storeToRefs(role)
 
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const router = useRouter()
@@ -22,6 +21,8 @@ const announcementData = ref({})
 
 
 onMounted(async ()=>{
+  console.log(userRole.value)
+
   //get ค่า active มาว่าเป็น จริงหรือเท็จ
   isActive.value = userAnn.getMode()
   // console.log(isActive.value)
@@ -46,70 +47,33 @@ const changeMode = async () =>{
 
 
 
-
 const getActiveAnnouncements = async () => {
     try {
-        const res = await fetch(API_ROOT + '/api/announcements?mode=active', {
-            headers: {
-                'Authorization': getToken()
-            }
-        });
+        const res = await fetch(API_ROOT + '/api/announcements?mode=active');
 
         if (res.ok) {
             announcementData.value = await res.json();
-        } else if (res.status === 401) {
-            // Attempt to refresh token
-            await getNewToken();
-            // If token refresh is successful, retry the request
-            const res2 = await fetch(API_ROOT + '/api/announcements?mode=active', {
-                headers: {
-                    'Authorization': getToken()
-                }
-            });
 
-            if (res2.ok) {
-                announcementData.value = await res2.json();
-            } else {
-                throw new Error('Could not load data even after token refresh');
-            }
-        } else {
+        }else {
             throw new Error('Could not load data');
         }
     } catch (error) {
-      return error
+      console.error('error ', error);
     }
 }
 
 const getClosedAnnouncements = async () => {
     try {
-        const res = await fetch(API_ROOT + '/api/announcements?mode=close', {
-            headers: {
-                'Authorization': getToken()
-            }
-        });
+        const res = await fetch(API_ROOT + '/api/announcements?mode=close');
 
         if (res.ok) {
             announcementData.value = await res.json();
-        } else if (res.status === 401) {
-            // Attempt to refresh token
-            await getNewToken();
-            // If token refresh is successful, retry the request
-            const res2 = await fetch(API_ROOT + '/api/announcements?mode=close', {
-                headers: {
-                    'Authorization': getToken()
-                }
-            });
-
-            if (res2.ok) {
-                announcementData.value = await res2.json();
-            } else {
-                throw new Error('Could not load data even after token refresh');
-            }
-        } else {
+        }else {
             throw new Error('Could not load data');
         }
+
     } catch (error) {
-      return error
+      console.log('error ',error)
     }
 }
 

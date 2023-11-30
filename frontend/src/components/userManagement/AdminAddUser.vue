@@ -2,52 +2,61 @@
 import { ref, onMounted,computed } from 'vue';
 import { useRouter } from 'vue-router'
 import { getNewToken } from '../../composable/getNewToken';
+import { useAuthorize } from '../../Store/authorize';
+import { storeToRefs } from 'pinia';
+const myRole = useAuthorize()
+const {userRole} = storeToRefs(myRole)
 const oldUsers = ref([])
+
 onMounted(async()=>{
-    oldUsers.value = await getUsers()
+    if(userRole.value !== 'admin'){
+    alert('Access Deny')
+    router.back()
+  }
+        await getUsers()
 })
 
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const router = useRouter()
 
-const getToken = () =>{
-  const token = localStorage.getItem("token")
-  return "Bearer " + token
-}
-
 const getUsers = async () => {
+
   try {
     const res = await fetch(API_ROOT + "/api/users", {
       headers: {
-        'Authorization': getToken()
+        'Authorization': "Bearer " + localStorage.getItem('token')
       }
     });
 
     if (res.ok) {
-      const userData = await res.json();
-      return userData;
-    } else if (res.status === 401) {
-      // Token is invalid, attempt to refresh it
-      await getNewToken();
+        oldUsers.value = await res.json();
 
-      // Retry the API request with the new token
-      const res2 = await fetch(API_ROOT + "/api/users", {
-        headers: {
-          'Authorization': getToken()
+    }else 
+        if (res.status === 401) {
+        try {
+          await getNewToken();
+          const newRes = await fetch(API_ROOT + "/api/users", {
+            headers: {
+              "Content-Type": "application/json",
+              'Authorization': "Bearer " + localStorage.getItem('token')
+            }
+          });
+
+          if (newRes.ok) {
+            oldUsers.value = await newRes.json();
+          } else {
+            clearToken();
+            router.push({ name: 'login' });
+          }
+        } catch (error) {
+          console.error('Failed to get new token:', error);
+          router.push({ name: 'login' });
         }
-      });
-
-      if (res2.ok) {
-        const userData = await res2.json();
-        return userData;
       } else {
-        throw new Error('Error, cannot get data even after token refresh!');
-      }
-    } else {
-      throw new Error('Error, cannot get data!');
-    }
+        throw new Error('Error, cannot get data!');
+        }
   } catch (error) {
-    return error
+    console.error('error ', error);
   }
 };
 
@@ -219,7 +228,7 @@ const submit = async () => {
             method: 'POST',
             headers : {
             "Content-Type": "application/json",
-            'Authorization': getToken()
+            'Authorization': "Bearer " + localStorage.getItem('token')
         },
             body: JSON.stringify(newUser)
         });

@@ -1,17 +1,22 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import AdminAnnView from '../views/AdminView/AdminAnnView.vue'
-import AdminAnnDetail from '../views/AdminView/AdminAnnDetail.vue'
-import CreateAnnouncement from '../views/CreateAnnouncement.vue'
-import DeleteAnnouncement from '../views/DeleteAnnouncement.vue'
-import UpdateAnnouncement from '../views/UpdateAnnouncement.vue'
-import UserAnnView from '../views/UserView/UserAnnView.vue'
-import UserAnnDetail from '../views/UserView/UserAnnDetail.vue'
-import AdminUserView from '../views/AdminView/AdminUserView.vue'
-import AdminAddUser from '../views/AdminView/AdminAddUser.vue'
-import AdminEditUser from '../views/AdminView/AdminEditUser.vue' 
-import AdminDeleteUser from '../views/AdminView/AdminDeleteUser.vue' 
-import MatchPassword from '../views/AdminView/MatchPassword.vue'
-import LoginView from '../views/LoginView.vue'
+
+import AdminAnnDetail from '../components/adminView/AdminAnnDetail.vue'
+import AdminAnnView from '../components/adminView/AdminAnnView.vue'
+import AdminUserView from '../components/adminView/AdminUserView.vue'
+
+import CreateAnnouncement from '../components/announceManagement/CreateAnnouncement.vue'
+import UpdateAnnouncement from '../components/announceManagement/UpdateAnnouncement.vue'
+
+import UserAnnView from '../components/userView/UserAnnView.vue'
+import UserAnnDetail from '../components/userView/UserAnnDetail.vue'
+
+import AdminAddUser from '../components/userManagement/AdminAddUser.vue'
+import AdminEditUser from '../components/userManagement/AdminEditUser.vue' 
+
+import MatchPassword from '../components/AdminView/MatchPassword.vue'
+import LoginView from '../components/LoginView.vue'
+
+import jwt_decode from 'jwt-decode';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,22 +28,17 @@ const router = createRouter({
     },
     {
       path: '/admin/announcement/:id',
-      name: 'desc',
+      name: 'AdminAnnDetail',
       component: AdminAnnDetail
     },
     {
       path: '/admin/announcement/add',
-      name: 'addAnnounce',
+      name: 'CreateAnnouncement',
       component: CreateAnnouncement
     },
     {
-      path: '/admin/announcement/:id/delete',
-      name: 'deleteAnnounce',
-      component: DeleteAnnouncement
-    },
-    {
       path: '/admin/announcement/:id/edit',
-      name: 'updateAnnounce',
+      name: 'UpdateAnnouncement',
       component: UpdateAnnouncement
     },
     {
@@ -67,11 +67,6 @@ const router = createRouter({
       component: AdminEditUser
     },
     {
-      path: '/admin/user/:id',
-      name: 'AdminDeleteUser',
-      component: AdminDeleteUser
-    },
-    {
       path: '/admin/user/match',
       name: 'MatchPassword',
       component: MatchPassword
@@ -86,7 +81,34 @@ const router = createRouter({
       component : LoginView
     }
   ]
+
 })
+
+
+router.beforeEach(async (to, from, next) => {
+  if (to.path === "/") {
+    next('/announcement');
+  } else if (localStorage.getItem("token") === null && localStorage.getItem("refreshToken") === null) {
+    if (to.fullPath.includes("/admin/")) {
+      alert("Please login");
+      next('/login');
+    } else {
+      next();
+    }
+  } else {
+    const userRole = localStorage.getItem("userRole")
+    if (to.fullPath.includes("/user/") && userRole !== 'admin') {
+      alert("Access denied");
+      next('/announcement'); // หรือสามารถเปลี่ยนเส้นทางไปยังหน้าที่เหมาะสมได้
+    } else {
+      next();
+    }
+  }
+});
+
+
+
+
 
 
 export default router

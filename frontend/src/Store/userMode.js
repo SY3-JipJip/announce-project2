@@ -1,4 +1,4 @@
-import { defineStore} from "pinia";
+import { defineStore, acceptHMRUpdate} from "pinia";
 import { ref } from "vue";
 export const userAnnouncement = defineStore('userAnnouncement',()=>{
     const mode = ref(true)
@@ -7,3 +7,6 @@ export const userAnnouncement = defineStore('userAnnouncement',()=>{
     return { setMode , getMode} 
 
 })
+if (import.meta.hot) {
+    import.meta.hot.accept(acceptHMRUpdate(userAnnouncement, import.meta.hot))
+  }

@@ -1,49 +1,58 @@
 <script setup>
 import { ref, onMounted,computed } from 'vue';
 import { useRouter } from 'vue-router'
-import { getNewToken } from '../composable/getNewToken';
+import { getNewToken } from '../../composable/getNewToken';
+
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const router = useRouter()
 
 //ALL CATEGORIES
 const categories = ref({})
 onMounted(async()=>{
-    categories.value = await getCategories()
-    
+       await getCategories()
 })
-
-const getToken = () =>{
-  const token = localStorage.getItem("token")
-  return "Bearer " + token
-}
 
 const getCategories = async () => {
   try {
     const res = await fetch(API_ROOT + "/api/categories", {
       headers: {
         "Content-Type": "application/json",
-        'Authorization': getToken()
+        'Authorization': "Bearer " + localStorage.getItem('token')
       }
     });
 
     if (!res.ok) {
       if (res.status === 401) {
-        // Token is invalid, attempt to refresh it
-        await getNewToken();
+        try {
+          await getNewToken();
+          const newRes = await fetch(API_ROOT + "/api/categories", {
+            headers: {
+              "Content-Type": "application/json",
+              'Authorization': "Bearer " + localStorage.getItem('token')
+            }
+          });
 
-        // Retry the `getCategories` function with the new token
-        return await getCategories();
+          if (newRes.ok) {
+              categories.value = await newRes.json();
+          } 
+        } catch (error) {
+          console.error('Failed to get new token:', error);
+          router.push({ name: 'login' });
+        }
+      } else if (res.status === 403) {
+        alert('Sorry, you do not have permission to access this page.');
+        router.push({ name: 'UserAnnView' });
       } else {
         throw new Error('Error, cannot get data!');
       }
     } else {
-      const categories = await res.json();
-      return categories;
+      categories.value = await res.json();
     }
   } catch (error) {
-    return error
+    console.error('error ', error);
   }
-}
+};
+
 
 //ถ้า USER ไม่กรอกข้อมูล title หรือ category หรือ description ก็จะไม่ยอมให้ กดปุ่ม submit 
 const submitBtn = computed(()=>{
@@ -113,7 +122,7 @@ const submit = async () => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    'Authorization': getToken()
+                    'Authorization': "Bearer " + localStorage.getItem('token')
                 },
                 body: JSON.stringify(announcementObj.value)
             })
@@ -122,8 +131,7 @@ const submit = async () => {
                 const response = await res.json()
                 router.push('/admin/announcement')
             } else if (res.status === 401) {
-                // 401 Unauthorized: เรียกใช้งานการเปลี่ยนเส้นทางไปยังหน้า login
-                router.push({ name: 'login' });
+                await getCategories()
             } else {
                 alert('Could not create this announcement, please try again.');
             }
@@ -142,7 +150,7 @@ const submit = async () => {
     <!-- Add Announcement Title -->
 
     <div class="flex flex-row items-center justify-center mt-2">
-        <div><img src="../assets/images/add.png" class="h-20"></div>
+        <div><img src="../../assets/images/add.png" class="h-20"></div>
         <div><h1 class="ml-10 mb-3 font-bold flex w-full text-3xl m-5">Add Announcement</h1></div>
     </div>
        

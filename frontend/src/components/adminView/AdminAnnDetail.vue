@@ -3,38 +3,46 @@ import {ref, onMounted } from 'vue';
 import { useRoute ,useRouter } from 'vue-router'
 import { formatDate } from '../../composable/formatDate'
 import { getNewToken } from '../../composable/getNewToken';
+
 const router = useRouter()
 const { params } = useRoute()
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const announcementDetail = ref([])
 
 onMounted(async()=>{
-    await loadDetail()
+        await loadDetail()
 })
 
-const getToken = () =>{
-  const token = localStorage.getItem("token")
-  return "Bearer " + token
-}
 
 const loadDetail = async () => {
     try {
         const res = await fetch(`${API_ROOT}/api/announcements/${params.id}`, {
             headers: {
                 "Content-Type": "application/json",
-                'Authorization': getToken()
+                'Authorization': "Bearer " + localStorage.getItem('token')
             }
         });
 
         if (!res.ok) {
             if (res.status === 401) {
-                // Token is invalid, attempt to refresh it
-                await getNewToken();
+                try {
+                    await getNewToken();
+                    const newRes = await fetch(`${API_ROOT}/api/announcements/${params.id}`, {
+                        headers: {
+                            "Content-Type": "application/json",
+                            'Authorization': "Bearer " + localStorage.getItem('token')
+                        }
+                    });
 
-                // Retry the `loadDetail` function with the new token
-                return await loadDetail();
+                    if (newRes.ok) {
+                        announcementDetail.value = await newRes.json();
+                    }
+                } catch (error) {
+                    console.error('Failed to get new token:', error);
+                    router.push({ name: 'login' });
+                }
             } else {
-                alert('The request page is not available');
+                alert('The requested page is not available');
                 router.push({
                     name: 'home'
                 });
@@ -44,15 +52,14 @@ const loadDetail = async () => {
             announcementDetail.value = await res.json();
         }
     } catch (error) {
-        return error
+        console.error('error ', error);
     }
-}
-
+};
 
 
 const editAnnouncement = (announcementId) =>{
     router.push({
-        name : 'updateAnnounce',
+        name : 'UpdateAnnouncement',
         params : {id : announcementId}
     })
 }

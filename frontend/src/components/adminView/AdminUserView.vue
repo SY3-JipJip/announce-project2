@@ -2,62 +2,100 @@
 import {ref,onMounted,computed} from 'vue'
 import { formatDate } from '../../composable/formatDate'
 import { useRouter } from 'vue-router'
-import { getNewToken } from '../../composable/getNewToken';
+import {getNewToken} from '../../composable/getNewToken'
+
+import { useAuthorize } from '../../Store/authorize';
+import { storeToRefs } from 'pinia';
+const myRole = useAuthorize()
+const {userRole} = storeToRefs(myRole)
+
 const API_ROOT = import.meta.env.VITE_API_ROOT
 const router = useRouter()
 
-
 const userData = ref([])
 
-const getToken = () =>{
-  const token = localStorage.getItem("token")
-  return "Bearer " + token
-}
-
-onMounted(async()=>{
-  userData.value = await getUsers()
+onMounted(async ()=>{
+  if(userRole.value !== 'admin'){
+    alert('Access Deny')
+    router.back()
+  }
+      await getUsers()
+  
 })
+
+// const getAllToken = ()=>{
+//   console.log('token',localStorage.getItem('token'))
+//   console.log('refreshToken',localStorage.getItem('refreshToken'))
+//   console.log(userRole.value)
+// }
 
 
 const getUsers = async () => {
-  const router = useRouter();
-
   try {
     const res = await fetch(API_ROOT + "/api/users", {
       headers: {
         "Content-Type": "application/json",
-        'Authorization': getToken()
+        'Authorization': "Bearer " + localStorage.getItem('token')
       }
     });
 
     if (res.ok) {
-      const userData = await res.json();
-      return userData;
-    } else if (res.status === 401) {
-      // Attempt to refresh token
-      await getNewToken();
-      // If token refresh is successful, try getting users again
-      const res2 = await fetch(API_ROOT + "/api/users", {
-        headers: {
-          "Content-Type": "application/json",
-          'Authorization': getToken()
-        }
-      });
-
-      if (res2.ok) {
-        const userData = await res2.json();
-        return userData;
-      } else {
-        throw new Error('Error, cannot get data even after token refresh!');
-      }
+      userData.value = await res.json();
     } else {
-      throw new Error('Error, cannot get data!');
+      if (res.status === 401) {
+        try {
+          await getNewToken();
+          const newRes = await fetch(API_ROOT + "/api/users", {
+            headers: {
+              "Content-Type": "application/json",
+              'Authorization': "Bearer " + localStorage.getItem('token')
+            }
+          });
+
+          if (newRes.ok) {
+            userData.value = await newRes.json();
+          } 
+        } catch (error) {
+          console.error('Failed to get new token:', error);
+          router.push({ name: 'login' });
+        }
+      } else {
+        throw new Error('Error, cannot get data!');
+      }
     }
   } catch (error) {
-    return error
+    return error;
   }
 };
 
+
+
+const deleteUser = async (userId) =>{
+  const confirmed = window.confirm('Do you want to delete');
+  if (confirmed) {
+    try {
+      const res = await fetch(`${API_ROOT}/api/users/${userId}`,{
+      headers:{
+        "Content-Type": "application/json",
+        'Authorization': localStorage.getItem('token')
+      },
+        method:'DELETE'
+      })
+      if(res.ok){    
+        userData.value = userData.value.filter((data)=>data.id !== userId)
+      } else {
+        alert(`There are no user id = ${userId}`);
+        throw new Error('cannot delete data!')
+      }
+    } catch(error) {
+      console.log('error ',error)
+    }
+  }else{
+    router.push({
+        name : 'AdminUserView'
+      })
+  }
+}
 
 
 const sortedUserData = computed(() => {
@@ -78,12 +116,6 @@ const editUser = (userId) =>{
   })
 }
 
-const deleteUser = async (userId) =>{
-  router.push({
-    name : 'AdminDeleteUser',
-    params : {id : userId}
-  })
-}
 </script>
  
 <template>
@@ -141,14 +173,14 @@ const deleteUser = async (userId) =>{
             <td class="ann-created-on" :class="user.createdOn === null ? 'text-center' :'' " >{{ user.createdOn === null ? '-' : formatDate(user.createdOn) }}</td>
             <td class="ann-updated-on" :class="user.updatedOn === null ? 'text-center' :'' ">{{ user.updatedOn === null ? '-' : formatDate(user.updatedOn) }}</td>
             <td class="flex justify-center space-x-2">
-              <button @click="editUser(user.id,token)"  class="ann-button border border-gray-600 p-1 pl-4 pr-4 border-y-6 bg-gray-500 rounded-md btn-sm btn">edit</button>
-              <button @click="deleteUser(user.id,token)"  class="ann-button border border-red-600 p-1 pl-3 pr-3 border-y-6 bg-red-600 rounded-md btn-sm btn">delete</button>
+              <button @click="editUser(user.id)"  class="ann-button border border-gray-600 p-1 pl-4 pr-4 border-y-6 bg-gray-500 rounded-md btn-sm btn">edit</button>
+              <button @click="deleteUser(user.id)"  class="ann-button border border-red-600 p-1 pl-3 pr-3 border-y-6 bg-red-600 rounded-md btn-sm btn">delete</button>
             </td>
           </tr>
         </tbody>
   </table>
 
-
+  <!-- <button @click="getAllToken" class="btn btn-primary">click here</button> -->
 </div>
 
 
