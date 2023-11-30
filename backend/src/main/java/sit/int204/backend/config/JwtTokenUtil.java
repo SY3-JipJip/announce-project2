@@ -7,7 +7,9 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import sit.int204.backend.entities.User;
 import sit.int204.backend.properties.JwtProperties;
+import sit.int204.backend.repositories.UserRepository;
 
 
 import java.io.Serializable;
@@ -21,9 +23,18 @@ public class JwtTokenUtil implements Serializable {
     @Autowired
     private JwtProperties jwtProperties;
 
+    @Autowired
+    private UserRepository userRepository;
+
     //retrieve username from jwt token
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
+    }
+
+    public String getRoleFromToken(String token) {
+        final Claims claims = getAllClaimsFromToken(token);
+        System.out.println(claims.get("role").toString());
+        return claims.get("role").toString();
     }
 
     //retrieve expiration date from jwt token
@@ -71,6 +82,8 @@ public class JwtTokenUtil implements Serializable {
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
+        User user = userRepository.findUserByUsername(userDetails.getUsername());
+        claims.put("role", user.getRole());
         return doGenerateToken(claims, userDetails.getUsername());
     }
 }

@@ -23,6 +23,7 @@ public class AnnouncementDTO {
     private Instant publishDate;
     private Instant closeDate;
     private AnnouncementDisplayEnum announcementDisplay;
+    private String announcementOwner;
 
 
 

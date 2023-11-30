@@ -3,6 +3,8 @@ package sit.int204.backend.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import net.minidev.json.annotate.JsonIgnore;
+
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
@@ -18,6 +20,7 @@ public class User {
     private int id;
     @Column(name = "username", nullable = false, length = 45)
     private String username;
+    @JsonIgnore
     @Column(name = "password", nullable = false, length = 100)
     private String password;
     @Column(name = "name", nullable = false, length = 100)

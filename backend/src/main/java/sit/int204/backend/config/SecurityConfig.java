@@ -15,7 +15,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.OPTIONS;
+import static sit.int204.backend.entities.UserRoleEnum.admin;
 
 @Configuration
 @EnableWebSecurity
@@ -34,8 +36,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
-                .authorizeRequests().requestMatchers("/api/token", "/api/announcements").permitAll().
-                anyRequest().authenticated().and().
+                .authorizeRequests().requestMatchers("/api/token", "/api/announcements").permitAll()
+//                .requestMatchers("/api/announcements").hasRole("admin")
+                .requestMatchers(GET,"/api/announcements/**").permitAll()
+                .anyRequest().authenticated().and().
                 exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
@@ -46,3 +50,4 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
+

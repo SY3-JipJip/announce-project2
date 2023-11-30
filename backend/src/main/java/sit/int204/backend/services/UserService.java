@@ -6,33 +6,41 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import sit.int204.backend.config.JwtTokenUtil;
 import sit.int204.backend.dtos.CreateUserDTO;
 import sit.int204.backend.dtos.UserDTO;
 import sit.int204.backend.dtos.UserMatchDTO;
+import sit.int204.backend.entities.Announcement;
 import sit.int204.backend.entities.User;
 import sit.int204.backend.exception.ResourceNotFoundException;
 import sit.int204.backend.exception.UnauthorizedException;
+import sit.int204.backend.repositories.AnnouncementRepository;
 import sit.int204.backend.repositories.UserRepository;
 
-
 import java.util.List;
+import java.util.Objects;
+
 
 @Service
 public class UserService{
     @Autowired
     private UserRepository repository;
-
-
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    private AnnouncementRepository AnnRepository;
     //Get All Users
     public List<User> getAllUsers() {
         return repository.findAll();
     }
+
 
     //Get 1 User
     public User getUserById(int id){
         return repository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("User Id" + id + "DOES NOT EXIST !!!"));
     }
+
 
     //Create User
     public User createUser(@Valid CreateUserDTO userDTO){
@@ -54,10 +62,22 @@ public class UserService{
     }
 
     // Delete User
-    public User deleteUser(int id) {
+    public User deleteUser(int id, String token) {
+        System.out.println("1");
         User user = repository.findById(id).orElseThrow(() -> new RuntimeException(id + " DOES NOT EXIST !!!"));
-        repository.delete(user);
-        return user;
+        String username = jwtTokenUtil.getUsernameFromToken(token.substring(7));
+        if(!Objects.equals(user.getUsername(), username)){
+            System.out.println("2");
+            User newUser = repository.findUserByUsername(username);
+            List<Announcement> AnnList = AnnRepository.findAnnouncementsByUsers(user);
+            AnnRepository.changeOwnerWhenDelete(newUser, user, newUser.getUsername());
+            repository.delete(user);
+            System.out.println("3");
+            return user;
+        }else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
     }
 
     // Password Matching
@@ -72,4 +92,5 @@ public class UserService{
             throw new UnauthorizedException( "Password is not matching!!!");
         }
     }
+
 }

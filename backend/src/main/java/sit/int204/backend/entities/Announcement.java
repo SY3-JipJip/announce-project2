@@ -25,6 +25,8 @@ public class Announcement {
         private Instant publishDate;
         @Column(name = "closeDate", length = 200)
         private Instant closeDate;
+        @Column(name = "announcementOwner", length = 45)
+        private String announcementOwner;
 
         @Enumerated(EnumType.STRING)
         @Column(name = "announcementDisplay", nullable = false, length = 20)
@@ -35,6 +37,10 @@ public class Announcement {
          @JoinColumn(name = "categoryId")
          private Category categories;
 
+        @JsonIgnore
+        @ManyToOne
+        @JoinColumn(name = "userId")
+        private User users;
 
 }
 
