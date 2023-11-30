@@ -31,17 +31,15 @@ public class Announcement {
         @Enumerated(EnumType.STRING)
         @Column(name = "announcementDisplay", nullable = false, length = 20)
         private AnnouncementDisplayEnum announcementDisplay;
-
          @JsonIgnore
          @ManyToOne
          @JoinColumn(name = "categoryId")
          private Category categories;
-
+        
         @JsonIgnore
         @ManyToOne
         @JoinColumn(name = "userId")
         private User users;
-
 }
 
 
