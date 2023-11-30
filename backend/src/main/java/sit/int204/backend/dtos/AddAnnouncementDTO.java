@@ -21,6 +21,7 @@ public class AddAnnouncementDTO {
     private Instant closeDate;
     private AnnouncementDisplayEnum announcementDisplay;
     private Integer categoryId;
+    private String announcementOwner;
 
     public void setAnnouncementTitle(String title){
         if (title.length()>200){

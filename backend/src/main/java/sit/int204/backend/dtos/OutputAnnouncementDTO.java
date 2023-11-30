@@ -21,6 +21,7 @@ public class OutputAnnouncementDTO {
     private Instant publishDate;
     private Instant closeDate;
     private AnnouncementDisplayEnum announcementDisplay;
+    private String announcementOwner;
 
     @JsonIgnore
     private Category categories;
@@ -31,5 +32,6 @@ public class OutputAnnouncementDTO {
     public String getAnnouncementCategory(){
         return categories.getAnnouncementCategory();
     }
+
 
 }

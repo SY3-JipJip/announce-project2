@@ -38,5 +38,7 @@ public interface UserRepository extends JpaRepository<User,Integer> {
     Long findUniqueUserOnUpdate(String fieldName, String value, Integer id);
 
 
+
+
 }
 

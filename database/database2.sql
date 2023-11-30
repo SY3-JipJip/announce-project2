@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`announces` (
   `closeDate` DATETIME NULL DEFAULT NULL,
   `announcementDisplay` ENUM('Y', 'N') NOT NULL,
   `categoryId` INT NOT NULL,
+  `announcementOwner` VARCHAR(45) NOT NULL,   -- INT NOT NULL
   `userId` INT NOT NULL,
   PRIMARY KEY (`announcementId`),
   INDEX `fk_announces_categories_idx` (`categoryId` ASC) VISIBLE,
