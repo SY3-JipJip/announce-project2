@@ -23,7 +23,8 @@ const loadDetail = async () => {
     });
         if(res.ok){
         announcementDetail.value = await res.json();
-        
+        }else if(res.status==403){
+            router.push('/login')
         }else {
             try {
                 await getNewToken();
