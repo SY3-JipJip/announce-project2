@@ -16,14 +16,6 @@ export const useAuthorize = defineStore('authorize', () => {
     }
   };
 
-  // อ่านค่า userRole จาก localStorage เมื่อแอปพลิเคชันถูกรีเฟรช
-  const updateFromLocalStorage = () => {
-    const storedUserRole = localStorage.getItem("userRole");
-    if (storedUserRole) {
-      userRole.value = storedUserRole;
-    }
-  };
-
   // ตรวจจับการเปลี่ยนแปลงใน localStorage และอัปเดตค่า userRole
   watch(() => localStorage.getItem("userRole"), (newValue) => {
     if (newValue !== userRole.value) {
@@ -31,7 +23,7 @@ export const useAuthorize = defineStore('authorize', () => {
     }
   });
 
-  return { userRole, setRole, updateFromLocalStorage };
+  return { userRole, setRole };
 });
 
 if (import.meta.hot) {

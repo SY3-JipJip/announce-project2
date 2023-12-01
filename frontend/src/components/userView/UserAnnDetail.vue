@@ -15,11 +15,6 @@ onMounted(async()=>{
 
 const loadDetail = async () => {
 
-    if (!localStorage.getItem('refreshToken')) {
-        alert('Please login!')
-        router.push({name:'login'})
-    }
-
   try {
     const res = await fetch(`${API_ROOT}/api/announcements/${params.id}`, {
       headers: {
@@ -28,20 +23,28 @@ const loadDetail = async () => {
     });
         if(res.ok){
         announcementDetail.value = await res.json();
-
+        
         }else {
+            try {
+                await getNewToken();
+                const newRes = await fetch(API_ROOT + "/api/users", {
+                    headers: {
+                    'Authorization': "Bearer " + localStorage.getItem('token')
+                    }
+                });
 
-            if(res.status===401){
-                await getNewToken()
-                return await loadDetail()
-            }else{
-                throw new Error('Could not load data');
-            }   
+                if (newRes.ok) {
+                    announcementDetail.value = await res.json();
+                } 
+                
+            } catch (error) {
+                // console.error('Failed to get new token:', error);
+            }
     }
 
-  } catch (error) {
-    console.log('error ',error)
-  }
+    } catch (error) {
+        console.log('error ',error)
+    }
 };
 
 

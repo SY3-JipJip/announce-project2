@@ -23,12 +23,6 @@ onMounted(async ()=>{
   
 })
 
-// const getAllToken = ()=>{
-//   console.log('token',localStorage.getItem('token'))
-//   console.log('refreshToken',localStorage.getItem('refreshToken'))
-//   console.log(userRole.value)
-// }
-
 
 const getUsers = async () => {
   try {
@@ -56,15 +50,12 @@ const getUsers = async () => {
             userData.value = await newRes.json();
           } 
         } catch (error) {
-          console.error('Failed to get new token:', error);
-          router.push({ name: 'login' });
+          // console.error('Failed to get new token:', error);
         }
-      } else {
-        throw new Error('Error, cannot get data!');
-      }
+      } 
     }
   } catch (error) {
-    return error;
+    console.error('error ', error);
   }
 };
 

@@ -16,10 +16,10 @@ const getNewToken = async () => {
         const newToken = data.token;
         // บันทึก token ใหม่ใน localStorage และใน composition ref
         localStorage.setItem('token', newToken);
-        console.log('Token refreshed successfully');
+        // console.log('Token refreshed successfully');
       }else{
         clearToken()
-        alert('กรุณาเข้าสู่ระบบ')
+        alert('เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่อีกครั้ง')
         router.push({name:'login'})
       }
     } catch (err) {

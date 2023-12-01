@@ -95,18 +95,11 @@ const loadDetail = async () => {
             } 
 
         } catch (error) {
-          console.error('Failed to get new token:', error);
-          router.push({ name: 'login' });
+        //   console.error('Failed to get new token:', error);
         }
 
-      } else if (res.status === 403) {
-        alert('Sorry, you do not have permission to access this page.');
-        router.push({ name: 'UserAnnView' });
-      } else {
-        alert('The requested page is not available');
-        router.push({ name: 'home' });
-        throw new Error(res.status);
-      }
+      } 
+
     } else {
       announcementDetail.value = await res.json();
     }

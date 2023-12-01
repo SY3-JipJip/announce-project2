@@ -63,39 +63,28 @@ const getUserById = async (userId) => {
 
     if (!res.ok) {
       if (res.status === 401) {
-        try {
-          await getNewToken();
-          const newRes = await fetch(`${API_ROOT}/api/users/${userId}`, {
-            headers: {
-                "Content-Type": "application/json",
-                'Authorization': "Bearer " + localStorage.getItem('token')
-            },
-    });
+            try {
+                await getNewToken();
+                const newRes = await fetch(`${API_ROOT}/api/users/${userId}`, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Authorization': "Bearer " + localStorage.getItem('token')
+                    },
+                });
 
-          if (newRes.ok) {
-            userDetail.value = await newRes.json();
-          } else {
-            clearToken();
-            router.push({ name: 'login' });
-          }
-        } catch (error) {
-          console.error('Failed to get new token:', error);
-          router.push({ name: 'login' });
-        }
-
-        } else if(res.status === 403){
-            alert('Sorry, you do not have permission to access this page.')
-            router.push({name:'UserAnnView'})
-
-        } else {
-            alert('The requested page is not available');
-            router.push({name: 'AdminUserView'});
-            throw new Error(res.status);
-        }
+                if (newRes.ok) {
+                    userDetail.value = await newRes.json();
+                } 
+                
+            } catch (error) {
+                // console.error('Failed to get new token:', error);
+            }
+        } 
 
     } else {
         userDetail.value = await res.json();
     }
+
   } catch (error) {
     console.error('error ', error);
   }

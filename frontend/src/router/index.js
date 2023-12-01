@@ -90,7 +90,7 @@ router.beforeEach(async (to, from, next) => {
     next('/announcement');
   } else if (localStorage.getItem("token") === null && localStorage.getItem("refreshToken") === null) {
     if (to.fullPath.includes("/admin/")) {
-      alert("Please login");
+      alert("กรุณาเข้าสู่ระบบ");
       next('/login');
     } else {
       next();
@@ -98,7 +98,6 @@ router.beforeEach(async (to, from, next) => {
   } else {
     const userRole = localStorage.getItem("userRole")
     if (to.fullPath.includes("/user/") && userRole !== 'admin') {
-      alert("Access denied");
       next('/announcement'); // หรือสามารถเปลี่ยนเส้นทางไปยังหน้าที่เหมาะสมได้
     } else {
       next();

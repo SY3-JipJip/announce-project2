@@ -44,17 +44,14 @@ const getUsers = async () => {
 
           if (newRes.ok) {
             oldUsers.value = await newRes.json();
-          } else {
-            clearToken();
-            router.push({ name: 'login' });
-          }
+          } 
+          
         } catch (error) {
-          console.error('Failed to get new token:', error);
-          router.push({ name: 'login' });
+        //   console.error('Failed to get new token:', error);
         }
-      } else {
-        throw new Error('Error, cannot get data!');
-        }
+        
+      }
+        
   } catch (error) {
     console.error('error ', error);
   }

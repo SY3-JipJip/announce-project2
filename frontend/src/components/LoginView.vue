@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import {useAuthorize} from '../Store/authorize'
-import {clearToken} from '../composable/clearToken'
 const useAuthor = useAuthorize()
 const {setRole} = useAuthor
 const token = ref(null)

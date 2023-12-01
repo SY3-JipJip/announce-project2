@@ -38,19 +38,15 @@ const loadDetail = async () => {
                         announcementDetail.value = await newRes.json();
                     }
                 } catch (error) {
-                    console.error('Failed to get new token:', error);
-                    router.push({ name: 'login' });
+                    // console.error('Failed to get new token:', error);
                 }
-            } else {
-                alert('The requested page is not available');
-                router.push({
-                    name: 'home'
-                });
-                throw new Error(res.status);
+
             }
+
         } else {
             announcementDetail.value = await res.json();
         }
+        
     } catch (error) {
         console.error('error ', error);
     }

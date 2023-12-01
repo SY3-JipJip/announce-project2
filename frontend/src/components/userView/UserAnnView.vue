@@ -21,7 +21,7 @@ const announcementData = ref({})
 
 
 onMounted(async ()=>{
-  console.log(userRole.value)
+  // console.log(userRole.value)
 
   //get ค่า active มาว่าเป็น จริงหรือเท็จ
   isActive.value = userAnn.getMode()
@@ -55,7 +55,7 @@ const getActiveAnnouncements = async () => {
             announcementData.value = await res.json();
 
         }else {
-            throw new Error('Could not load data');
+          throw new Error(res.status);
         }
     } catch (error) {
       console.error('error ', error);
@@ -69,7 +69,7 @@ const getClosedAnnouncements = async () => {
         if (res.ok) {
             announcementData.value = await res.json();
         }else {
-            throw new Error('Could not load data');
+          throw new Error(res.status);
         }
 
     } catch (error) {
@@ -123,7 +123,9 @@ const showDetail = (announcementId) =>{
         <tbody v-if="announcementData !== null || announcementData.length !== 0">
           <tr class="ann-item text-left" v-for="announcement,index in announcementData">
             <th>{{ ++index }}</th>
-            <td @click="showDetail(announcement.id)" class="ann-title ">{{ announcement.announcementTitle }}</td>
+
+            <td v-show="userRole==='admin'" @click="showDetail(announcement.id)" class="ann-title ">{{ announcement.announcementTitle }}</td>
+            <td v-show="userRole!=='admin'" class="ann-title ">{{ announcement.announcementTitle }}</td>
             <td class="ann-close-date" v-if="!isActive">{{ announcement.closeDate === null ? '-' : formatDate(announcement.closeDate) }}</td>
             <td class="ann-category">{{ announcement.announcementCategory }}</td>
           </tr>
