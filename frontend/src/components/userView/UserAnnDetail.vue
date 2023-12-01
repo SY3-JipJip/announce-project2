@@ -23,8 +23,11 @@ const loadDetail = async () => {
     });
         if(res.ok){
         announcementDetail.value = await res.json();
+
         }else if(res.status==403){
-            router.push('/login')
+            alert("access deny");
+            router.push('/announcement')
+
         }else {
             try {
                 await getNewToken();
