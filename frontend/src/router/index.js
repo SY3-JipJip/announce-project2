@@ -13,7 +13,7 @@ import UserAnnDetail from '../components/userView/UserAnnDetail.vue'
 import AdminAddUser from '../components/userManagement/AdminAddUser.vue'
 import AdminEditUser from '../components/userManagement/AdminEditUser.vue' 
 
-import MatchPassword from '../components/AdminView/MatchPassword.vue'
+import MatchPassword from '../components/adminView/MatchPassword.vue'
 import LoginView from '../components/LoginView.vue'
 
 import jwt_decode from 'jwt-decode';
