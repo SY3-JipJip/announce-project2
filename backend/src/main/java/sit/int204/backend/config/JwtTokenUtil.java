@@ -65,13 +65,13 @@ public class JwtTokenUtil implements Serializable {
 
     private String doGenerateToken(Map<String, Object> claims, String subject) {
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getTokenIntervalInMinutes()*60*1000))    //หน่วยเป็น มิลิวินาที
+                .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getTokenIntervalInMinutes()*30*60*1000))    //หน่วยเป็น มิลิวินาที = 30 minutes
                 .signWith(SignatureAlgorithm.HS512, jwtProperties.getSecretKey()).compact();
     }
 
     private String doGenerateRefreshToken(Map<String, Object> claims, String subject) {
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getTokenIntervalInMinutes()*2*60*1000))    //หน่วยเป็น มิลิวินาที
+                .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getTokenIntervalInMinutes()*60*60*1000))    //หน่วยเป็น มิลิวินาที = 1 hours
                 .signWith(SignatureAlgorithm.HS512, jwtProperties.getSecretKey()).compact();
     }
     //validate token
