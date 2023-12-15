@@ -68,7 +68,7 @@ const deleteAnnouncement = async (announcementId) => {
             const res = await fetch(`${API_ROOT}/api/announcements/${announcementId}`, {
                 headers: {
                     "Content-Type": "application/json",
-                    'Authorization': getToken()
+                    'Authorization': "Bearer " + localStorage.getItem('token')
                 },
                 method: 'DELETE'
             })
