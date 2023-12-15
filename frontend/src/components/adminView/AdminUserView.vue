@@ -62,20 +62,31 @@ const getUsers = async () => {
 
 
 const deleteUser = async (userId) =>{
-  const confirmed = window.confirm('Do you want to delete');
+  const confirmed = window.confirm("The announcements owned by this user will be transfered to you. Do you still want to delete this user?");
   if (confirmed) {
     try {
       const res = await fetch(`${API_ROOT}/api/users/${userId}`,{
       headers:{
         "Content-Type": "application/json",
-        'Authorization': localStorage.getItem('token')
+        'Authorization': "Bearer " + localStorage.getItem('token')
       },
         method:'DELETE'
       })
+
       if(res.ok){    
         userData.value = userData.value.filter((data)=>data.id !== userId)
-      } else {
-        alert(`There are no user id = ${userId}`);
+      }
+      
+      else {
+        if(res.status == 401){
+          alert('access deny!')
+
+        }else if(res.status == 403){
+          alert('You cannot delete your own account.')
+
+        }else{
+          alert(`There are no user id = ${userId}`);
+        }
         throw new Error('cannot delete data!')
       }
     } catch(error) {

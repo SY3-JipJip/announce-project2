@@ -19,7 +19,7 @@ const getNewToken = async () => {
         // console.log('Token refreshed successfully');
       }else{
         clearToken()
-        alert('เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่อีกครั้ง')
+        alert('access deny! please login.')
         router.push({name:'login'})
       }
     } catch (err) {
