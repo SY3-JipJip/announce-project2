@@ -38,7 +38,7 @@ const login = async () =>{
                   })
 
 
-         //เข้าสู่ระบบเสร็จสมบูรณ์ ตั้งค่าคุกกี้ "token" และ "refreshToken" ด้วย $cookies.set() และนำทางผู้ใช้ไปยังหน้า "api/admin/announcement" ด้วย router.push().         
+         //เข้าสู่ระบบเสร็จสมบูรณ์         
         if(res.status === 200){
           statusCode.value = 200
           errText.value = 'Login Successfully'

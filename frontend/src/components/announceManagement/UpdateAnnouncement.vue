@@ -92,8 +92,7 @@ const loadDetail = async () => {
 
             if (newRes.ok) {
                 announcementDetail.value = await newRes.json();
-            } 
-
+            }
         } catch (error) {
         //   console.error('Failed to get new token:', error);
         }

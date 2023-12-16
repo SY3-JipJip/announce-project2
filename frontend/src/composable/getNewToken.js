@@ -14,12 +14,12 @@ const getNewToken = async () => {
       if (res.ok) {
         const data = await res.json();
         const newToken = data.token;
-        // บันทึก token ใหม่ใน localStorage และใน composition ref
+        // บันทึก token ใหม่ใน localStorage
         localStorage.setItem('token', newToken);
         // console.log('Token refreshed successfully');
       }else{
         clearToken()
-        alert('access deny! please login.')
+        alert('Please login.')
         router.push({name:'login'})
       }
     } catch (err) {

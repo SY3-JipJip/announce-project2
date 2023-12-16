@@ -86,9 +86,12 @@ const router = createRouter({
 
 
 router.beforeEach(async (to, from, next) => {
+
   if (to.path === "/") {
     next('/announcement');
-  } else if (localStorage.getItem("token") === null && localStorage.getItem("refreshToken") === null) {
+
+  } else if (localStorage.getItem("token") === null && localStorage.getItem("refreshToken")) {
+
     if (to.fullPath.includes("/admin/")) {
       alert("access deny! please login.");
       next('/login');

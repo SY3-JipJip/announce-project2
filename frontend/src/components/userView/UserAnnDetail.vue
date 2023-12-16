@@ -18,6 +18,7 @@ const loadDetail = async () => {
   try {
     const res = await fetch(`${API_ROOT}/api/announcements/${params.id}`, {
       headers: {
+        "Content-Type": "application/json",
         'Authorization': "Bearer " + localStorage.getItem('token')
       }
     });
@@ -79,14 +80,6 @@ const loadDetail = async () => {
     </div>
     <div class="flex flex-row">
         <router-link to="/announcement"><button class=" ml-5 font-bold pr-10 pl-10 flex ann-button btn bg-gray-400 border border-gray-300 text-gray-100">Back</button></router-link>
-        <div class="w-full flex justify-end">
-            <div class="w-full flex justify-end">
-            <div class="chat chat-end mb-52">
-                <div class="chat-bubble">Would you like to know more announcements? Let's Click on the back button</div>
-            </div>    
-            </div>
-                <img class="w-40" src="../../assets/images/raven.gif" alt="GIF"/>
-            </div>
     </div>  
 </div>
 </template>

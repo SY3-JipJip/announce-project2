@@ -96,7 +96,7 @@ const deleteAnnouncement = async (announcementId) => {
     <div class="m-2 flex flex-row">
       
           <!-- DateTime of Local User -->
-          <div class="flex w-full text-lg font-semibold p-2 items-center">
+          <div class="flex w-full text-lg font-semibold p-2 items-center text-xl">
               <h3>Date/Time shown in Timezone : <span class="text-green-700">{{ Intl.DateTimeFormat().resolvedOptions().timeZone }}</span></h3>
           </div>
 
@@ -141,18 +141,12 @@ const deleteAnnouncement = async (announcementId) => {
         </tbody>
       </table>
       
-      <h3 v-if="announcementData.length === 0" class="mt-3 flex justify-center items-center text-red-600 font-bold text-xl" >No Announcement</h3>
-      
-      <div class="flex flex-row">
-        <!-- <div class="w-full flex justify-start mt-10 ">  
-              <img class="w-52" src="../../assets/images/mafu.png"/>
-        </div>
-
-        <div class="w-full h-auto mt-20 flex justify-end mb-0">
-            <img class="flex ml-72" src="../../assets/images/pow2.gif"/>
-        </div> -->
-
+      <div class="w-full flex flex-col justify-center items-center">
+        <h3 v-if="announcementData.length === 0" class="mt-3 text-red-600 font-bold text-xl" >No Announcement</h3>
+        <img v-if="announcementData.length === 0" class="mt-3 h-56" src="../../assets/images/raven.gif" alt="GIF"/>
       </div>
+      
+      
   </div>
 </div>
 </template>
