@@ -90,7 +90,7 @@ router.beforeEach(async (to, from, next) => {
   if (to.path === "/") {
     next('/announcement');
 
-  } else if ((localStorage.getItem("token") === null )) {
+  } else if (localStorage.getItem("token") === null && localStorage.getItem("refreshToken")) {
 
     if (to.fullPath.includes("/admin/")) {
       alert("access deny! please login.");
@@ -98,7 +98,6 @@ router.beforeEach(async (to, from, next) => {
     } else {
       next();
     }
-    
   } else {
     const userRole = localStorage.getItem("userRole")
     if (to.fullPath.includes("/user/") && userRole !== 'admin') {
