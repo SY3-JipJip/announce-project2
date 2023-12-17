@@ -39,7 +39,7 @@ public class JwtTokenProvider {
     }
 
     private Date generateExpirationDate() {
-        // ตั้งเวลาหมดอายุของ Token (ในที่นี้ตั้งเป็น 1 นาที)
-        return new Date(System.currentTimeMillis() + 60 * 1000);
+        // ตั้งเวลาหมดอายุของ Token (ในที่นี้ตั้งเป็น 30 นาที)
+        return new Date(System.currentTimeMillis() + 30 * 60 * 1000);
     }
 }
