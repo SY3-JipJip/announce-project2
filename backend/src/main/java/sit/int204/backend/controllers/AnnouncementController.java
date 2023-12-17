@@ -19,7 +19,7 @@ import java.util.Objects;
 
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = {"http://localhost:5173/","http://127.0.0.1:5173/","https://intproj22.sit.kmutt.ac.th/"})
 @RequestMapping("/api/announcements")
 public class AnnouncementController {
     @Autowired
