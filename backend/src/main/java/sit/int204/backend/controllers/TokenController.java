@@ -16,7 +16,7 @@ import sit.int204.backend.repositories.UserRepository;
 import sit.int204.backend.services.JwtUserService;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = {"http://localhost:5173/","http://127.0.0.1:5173/","https://intproj22.sit.kmutt.ac.th/"})
 @RequestMapping(value = "/api/token")
 public class TokenController {
 
