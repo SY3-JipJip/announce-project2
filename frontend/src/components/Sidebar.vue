@@ -2,17 +2,10 @@
 import { useRoute } from 'vue-router';
 import {useAuthorize} from '../Store/authorize.js'
 import { storeToRefs } from 'pinia';
-
+import { clearToken } from '../composable/clearToken';
 const route = useRoute()
 const myRole = useAuthorize()
 const {userRole,setRole} = storeToRefs(myRole)
-
-
-const clearToken = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("refreshToken");
-  localStorage.removeItem("userRole")
-};
 
 </script>
  
