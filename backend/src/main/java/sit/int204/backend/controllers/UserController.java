@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = {"http://localhost:5173/","http://127.0.0.1:5173/","https://intproj22.sit.kmutt.ac.th/"})
 @RequestMapping("/api/users")
 public class UserController {
     @Autowired
