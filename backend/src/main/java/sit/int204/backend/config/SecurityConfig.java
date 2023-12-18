@@ -37,7 +37,6 @@ public class SecurityConfig {
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests().requestMatchers("/api/token", "/api/announcements").permitAll()
-//                .requestMatchers("/api/announcements").hasRole("admin")
                 .requestMatchers(GET,"/api/announcements/**").permitAll()
                 .anyRequest().authenticated().and().
                 exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
